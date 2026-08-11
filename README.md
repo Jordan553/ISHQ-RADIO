@@ -26,6 +26,6 @@ Open **http://localhost:4173** (on the same Wi-Fi, other devices can open `http:
 | File | Purpose |
 | --- | --- |
 | `index.html` | App shell (UI, controls, fullscreen button) |
-| `style.css` | The look — dark glass, ambient album-art glow, drifting इश्क़ glyphs |
+| `style.css` | The look — dark glass, ambient album-art glow, music-reactive इश्क़ wave |
 | `script.js` | Player + peer-to-peer sync client (PeerJS) |
 | `server.mjs` | Optional local file server (Bun, zero dependencies) |

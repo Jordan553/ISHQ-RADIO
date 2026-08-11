@@ -45,32 +45,43 @@ body{
   50%{ opacity:calc(var(--o,.03) * 2.4);}
 }
 
-/* beat-reactive pulse — JS sets --beat (one beat) & --beat-delay (phase)
-   from the song position, so every synced device pulses in the same beat */
-@keyframes bgBeat{
+/* music-reactive wave — JS sets --bar (one 4-beat bar) & --bar-delay (phase)
+   from the song position, so every synced device swells in the same flow */
+@keyframes bgWave{
   0%,100%{ transform:scale(1); }
-  12%{ transform:scale(1.02); }
+  50%{ transform:scale(1.01); }
 }
-@keyframes beatKick{
+@keyframes heartWave{
   0%,100%{ transform:translate(-50%,-50%) scale(1); }
-  12%{ transform:translate(-50%,-50%) scale(1.13); }
+  50%{ transform:translate(-50%,-50%) scale(1.06); }
 }
-@keyframes artBeat{
+@keyframes artWave{
   0%,100%{ opacity:.55; }
-  12%{ opacity:.75; }
+  50%{ opacity:.68; }
+}
+@keyframes glyphWave{
+  0%,100%{ opacity:var(--o,.03); }
+  50%{ opacity:calc(var(--o,.03) * 2); }
 }
 body.playing .bg{
-  animation:bgBeat var(--beat,535ms) ease-out infinite;
-  animation-delay:var(--beat-delay,0ms);
+  animation:bgWave var(--bar,2143ms) ease-in-out infinite;
+  animation-delay:var(--bar-delay,0ms);
 }
 body.playing .bg .heart{
-  animation:beatKick var(--beat,535ms) ease-out infinite;
-  animation-delay:var(--beat-delay,0ms);
+  animation:heartWave var(--bar,2143ms) ease-in-out infinite;
+  animation-delay:var(--bar-delay,0ms);
 }
 body.playing .ambient img{
-  animation:artBeat var(--beat,535ms) ease-out infinite;
-  animation-delay:var(--beat-delay,0ms);
+  animation:artWave var(--bar,2143ms) ease-in-out infinite;
+  animation-delay:var(--bar-delay,0ms);
 }
+body.playing .bg .glyph{
+  animation:drift 65s ease-in-out infinite alternate, glyphWave var(--bar,2143ms) ease-in-out infinite;
+  animation-delay:0s, calc(var(--bar-delay,0ms) + var(--ph,0) * var(--bar,2143ms));
+}
+.bg .g1{ --ph:0; }   .bg .g2{ --ph:.25; }
+.bg .g3{ --ph:.5; }  .bg .g4{ --ph:.75; }
+.bg .g5{ --ph:.125; } .bg .g6{ --ph:.375; }
 
 /* ---- ambient: blurred song art + light ---- */
 .ambient{
@@ -238,5 +249,6 @@ footer{
   .art{ width:150px; height:150px; }
 }
 @media (prefers-reduced-motion: reduce){
-  .bg, .bg .glyph, .bg .heart, .ambient img, .onair .dot, .load .spin{ animation:none; }
+  body.playing .bg, body.playing .bg .glyph, body.playing .bg .heart,
+  body.playing .ambient img, .onair .dot, .load .spin{ animation:none; }
 }

@@ -410,12 +410,12 @@
     }
   }, 5000);
 
-  /* beat-reactive background: pulse in time with the song position.
+  /* music-reactive background: a slow flowing wave in time with the song.
      add exact tempos here as { videoId: bpm } (optional, default 112) */
   var BEAT_HINTS = {};
   var BEAT_BPM = 112;
   setInterval(function () {
-    var beatMs = 60000 / BEAT_BPM;
+    var barMs = 60000 / BEAT_BPM * 4;
     var delay = '0ms';
     if (apiReady && player) {
       try {
@@ -424,15 +424,15 @@
           var d = player.getVideoData && player.getVideoData();
           if (d && d.video_id && BEAT_HINTS[d.video_id]) BEAT_BPM = BEAT_HINTS[d.video_id];
           var cur = player.getCurrentTime();
-          beatMs = 60000 / BEAT_BPM;
-          var phase = ((cur * BEAT_BPM / 60) % 1 + 1) % 1;
-          delay = (-phase * beatMs).toFixed(1) + 'ms';
+          barMs = 60000 / BEAT_BPM * 4;
+          var phase = ((cur * BEAT_BPM / 60 / 4) % 1 + 1) % 1;
+          delay = (-phase * barMs).toFixed(1) + 'ms';
         }
       } catch (e) {}
     }
     var root = document.documentElement;
-    root.style.setProperty('--beat', beatMs.toFixed(1) + 'ms');
-    root.style.setProperty('--beat-delay', delay);
+    root.style.setProperty('--bar', barMs.toFixed(1) + 'ms');
+    root.style.setProperty('--bar-delay', delay);
   }, 250);
 
   loadPeerJs().then(openRoom).catch(function () {
