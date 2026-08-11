@@ -267,6 +267,9 @@
 
   function resync() {
     if (!apiReady) return;
+    var st = -1;
+    try { st = player.getPlayerState(); } catch (e) {}
+    if (st === 1 || st === 2 || st === 3 || st === 0) return;
     try {
       var i = player.getPlaylistIndex ? player.getPlaylistIndex() : 0;
       player.loadPlaylist({ list: PLAYLIST, listType: 'playlist', index: i });
@@ -381,7 +384,7 @@
     if (S.state === 'follower' && S.station && S.station.videoId && !S.station.playing) return;
     var st = -1;
     try { st = player.getPlayerState(); } catch (e) {}
-    if (st === 1 || st === 3) { playRetries = 0; return; }
+    if (st === 1 || st === 3 || st === 0) { playRetries = 0; return; }
     ++playRetries;
     try { player.playVideo(); } catch (e) {}
   }, 2000);
@@ -392,6 +395,7 @@
     var exp = stationExpected(S.station);
     if (exp === null) return;
     try {
+      if (player.getPlayerState() === 0) return;
       var cur = player.getCurrentTime();
       if (Math.abs(cur - exp) > 1.5) player.seekTo(exp, true);
     } catch (e) {}
