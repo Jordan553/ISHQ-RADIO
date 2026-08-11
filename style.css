@@ -198,6 +198,11 @@ footer{
   width:100%; text-align:center;
   font-size:10px; letter-spacing:.3em; color:#55555c; text-transform:uppercase;
 }
+footer .credit{
+  display:block; margin-top:6px;
+  font-size:9px; letter-spacing:.25em;
+  color:#4a4a52;
+}
 .sync{
   display:inline-block; margin-left:6px; padding:2px 9px; border-radius:999px;
   border:1px solid rgba(255,255,255,.12); color:#77777f; letter-spacing:.2em; font-size:9px;
