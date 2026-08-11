@@ -45,6 +45,33 @@ body{
   50%{ opacity:calc(var(--o,.03) * 2.4);}
 }
 
+/* beat-reactive pulse — JS sets --beat (one beat) & --beat-delay (phase)
+   from the song position, so every synced device pulses in the same beat */
+@keyframes bgBeat{
+  0%,100%{ transform:scale(1); }
+  12%{ transform:scale(1.02); }
+}
+@keyframes beatKick{
+  0%,100%{ transform:translate(-50%,-50%) scale(1); }
+  12%{ transform:translate(-50%,-50%) scale(1.13); }
+}
+@keyframes artBeat{
+  0%,100%{ opacity:.55; }
+  12%{ opacity:.75; }
+}
+body.playing .bg{
+  animation:bgBeat var(--beat,535ms) ease-out infinite;
+  animation-delay:var(--beat-delay,0ms);
+}
+body.playing .bg .heart{
+  animation:beatKick var(--beat,535ms) ease-out infinite;
+  animation-delay:var(--beat-delay,0ms);
+}
+body.playing .ambient img{
+  animation:artBeat var(--beat,535ms) ease-out infinite;
+  animation-delay:var(--beat-delay,0ms);
+}
+
 /* ---- ambient: blurred song art + light ---- */
 .ambient{
   position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;
@@ -211,5 +238,5 @@ footer{
   .art{ width:150px; height:150px; }
 }
 @media (prefers-reduced-motion: reduce){
-  .bg .glyph, .bg .heart, .ambient img, .onair .dot, .load .spin{ animation:none; }
+  .bg, .bg .glyph, .bg .heart, .ambient img, .onair .dot, .load .spin{ animation:none; }
 }

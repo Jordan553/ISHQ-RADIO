@@ -410,6 +410,31 @@
     }
   }, 5000);
 
+  /* beat-reactive background: pulse in time with the song position.
+     add exact tempos here as { videoId: bpm } (optional, default 112) */
+  var BEAT_HINTS = {};
+  var BEAT_BPM = 112;
+  setInterval(function () {
+    var beatMs = 60000 / BEAT_BPM;
+    var delay = '0ms';
+    if (apiReady && player) {
+      try {
+        var st = player.getPlayerState();
+        if (st === 1) {
+          var d = player.getVideoData && player.getVideoData();
+          if (d && d.video_id && BEAT_HINTS[d.video_id]) BEAT_BPM = BEAT_HINTS[d.video_id];
+          var cur = player.getCurrentTime();
+          beatMs = 60000 / BEAT_BPM;
+          var phase = ((cur * BEAT_BPM / 60) % 1 + 1) % 1;
+          delay = (-phase * beatMs).toFixed(1) + 'ms';
+        }
+      } catch (e) {}
+    }
+    var root = document.documentElement;
+    root.style.setProperty('--beat', beatMs.toFixed(1) + 'ms');
+    root.style.setProperty('--beat-delay', delay);
+  }, 250);
+
   loadPeerJs().then(openRoom).catch(function () {
     setTimeout(function () {
       loadPeerJs().then(openRoom).catch(function () {});
