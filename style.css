@@ -45,44 +45,6 @@ body{
   50%{ opacity:calc(var(--o,.03) * 2.4);}
 }
 
-/* music-reactive wave — JS sets --bar (one 4-beat bar) & --bar-delay (phase)
-   from the song position, so every synced device swells in the same flow */
-@keyframes bgWave{
-  0%,100%{ transform:scale(1); }
-  50%{ transform:scale(1.01); }
-}
-@keyframes heartWave{
-  0%,100%{ transform:translate(-50%,-50%) scale(1); }
-  50%{ transform:translate(-50%,-50%) scale(1.06); }
-}
-@keyframes artWave{
-  0%,100%{ opacity:.55; }
-  50%{ opacity:.68; }
-}
-@keyframes glyphWave{
-  0%,100%{ opacity:var(--o,.03); }
-  50%{ opacity:calc(var(--o,.03) * 2); }
-}
-body.playing .bg{
-  animation:bgWave var(--bar,2143ms) ease-in-out infinite;
-  animation-delay:var(--bar-delay,0ms);
-}
-body.playing .bg .heart{
-  animation:heartWave var(--bar,2143ms) ease-in-out infinite;
-  animation-delay:var(--bar-delay,0ms);
-}
-body.playing .ambient img{
-  animation:artWave var(--bar,2143ms) ease-in-out infinite;
-  animation-delay:var(--bar-delay,0ms);
-}
-body.playing .bg .glyph{
-  animation:drift 65s ease-in-out infinite alternate, glyphWave var(--bar,2143ms) ease-in-out infinite;
-  animation-delay:0s, calc(var(--bar-delay,0ms) + var(--ph,0) * var(--bar,2143ms));
-}
-.bg .g1{ --ph:0; }   .bg .g2{ --ph:.25; }
-.bg .g3{ --ph:.5; }  .bg .g4{ --ph:.75; }
-.bg .g5{ --ph:.125; } .bg .g6{ --ph:.375; }
-
 /* ---- ambient: blurred song art + light ---- */
 .ambient{
   position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;
@@ -249,6 +211,5 @@ footer{
   .art{ width:150px; height:150px; }
 }
 @media (prefers-reduced-motion: reduce){
-  body.playing .bg, body.playing .bg .glyph, body.playing .bg .heart,
-  body.playing .ambient img, .onair .dot, .load .spin{ animation:none; }
+  .bg .glyph, .bg .heart, .ambient img, .onair .dot, .load .spin{ animation:none; }
 }

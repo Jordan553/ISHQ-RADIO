@@ -410,31 +410,6 @@
     }
   }, 5000);
 
-  /* music-reactive background: a slow flowing wave in time with the song.
-     add exact tempos here as { videoId: bpm } (optional, default 112) */
-  var BEAT_HINTS = {};
-  var BEAT_BPM = 112;
-  setInterval(function () {
-    var barMs = 60000 / BEAT_BPM * 4;
-    var delay = '0ms';
-    if (apiReady && player) {
-      try {
-        var st = player.getPlayerState();
-        if (st === 1) {
-          var d = player.getVideoData && player.getVideoData();
-          if (d && d.video_id && BEAT_HINTS[d.video_id]) BEAT_BPM = BEAT_HINTS[d.video_id];
-          var cur = player.getCurrentTime();
-          barMs = 60000 / BEAT_BPM * 4;
-          var phase = ((cur * BEAT_BPM / 60 / 4) % 1 + 1) % 1;
-          delay = (-phase * barMs).toFixed(1) + 'ms';
-        }
-      } catch (e) {}
-    }
-    var root = document.documentElement;
-    root.style.setProperty('--bar', barMs.toFixed(1) + 'ms');
-    root.style.setProperty('--bar-delay', delay);
-  }, 250);
-
   loadPeerJs().then(openRoom).catch(function () {
     setTimeout(function () {
       loadPeerJs().then(openRoom).catch(function () {});
