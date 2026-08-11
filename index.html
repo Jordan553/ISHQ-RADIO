@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>इश्क़ — ISHQ Radio</title>
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230a0a0b'/><text x='32' y='44' font-size='26' text-anchor='middle' fill='%23f2efe9' font-family='serif'>इश्क़</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="s-loading">
+  <div class="bg">
+    <span class="glyph g1">इश्क़</span><span class="glyph g2">इश्क़</span>
+    <span class="glyph g3">इश्क़</span><span class="glyph g4">इश्क़</span>
+    <span class="glyph g5">इश्क़</span><span class="glyph g6">इश्क़</span>
+    <span class="heart">इश्क़</span>
+  </div>
+  <div class="ambient" aria-hidden="true"><img id="ambientArt" alt="" draggable="false"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <div class="shell">
+    <header>
+      <div class="onair"><span class="dot"></span><span>On Air</span></div>
+      <div class="wordmark">इश्क़<small>ISHQ</small></div>
+      <div class="counts" id="counts">—</div>
+    </header>
+
+    <main>
+      <div class="state load">
+        <div class="spin"></div>
+        <div class="head">इश्क़</div>
+        <div class="msg">Tuning in…</div>
+      </div>
+      <div class="state error">
+        <div class="head">इश्क़</div>
+        <div class="msg" id="errmsg">Could not reach the station.</div>
+        <button id="retry">Retry</button>
+      </div>
+      <div class="state empty">
+        <div class="head">इश्क़</div>
+        <div class="msg">Nothing on the dial yet. Add songs to your playlist and they will join the air.</div>
+      </div>
+
+      <div class="stage">
+        <div class="artwrap"><img class="art" id="art" alt="" draggable="false"></div>
+        <h1 class="now" id="title">इश्क़</h1>
+        <div class="meta" id="meta">—</div>
+        <div class="controls">
+          <button class="side" id="prev" aria-label="Previous track">
+            <svg viewBox="0 0 24 24"><path d="M18 18l-8.5-6L18 6v12zM8 6H6v12h2z"/></svg>
+          </button>
+          <button class="play" id="play" aria-label="Play / Pause">
+            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+          </button>
+          <button class="side" id="next" aria-label="Next track">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6h2v12h-2z"/></svg>
+          </button>
+          <button class="syncbtn" id="syncbtn" aria-label="Sync with others">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+            <span id="synclabel">SYNC</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <footer>Auto-syncs new videos &middot; ISHQ इश्क़ &middot; <span class="sync" id="sync">SOLO</span></footer>
+  </div>
+
+  <div id="player"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
