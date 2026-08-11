@@ -4,43 +4,170 @@
 
   function $(id) { return document.getElementById(id); }
 
-  /* ---------- cross-device sync (radio broadcast) ---------- */
+  /* ---------- cross-device sync (PeerJS room — works on any static host) ---------- */
+  var ROOM = 'ishq-radio';
   var S = {
-    ws: null, connected: false, synced: false, leader: false, station: null,
+    peer: null, conn: null, conns: [], peers: 0,
+    state: 'none', /* none | claiming | leader | connecting | follower */
+    leader: false, station: null,
     clientId: 'c' + Math.random().toString(36).slice(2, 9)
   };
-  function syncBadge() {
-    var on = S.synced && S.connected;
-    var b = $('sync');
-    if (b) { b.textContent = on ? 'SYNCED' : 'SOLO'; b.classList.toggle('on', on); }
-    var l = $('synclabel');
-    if (l) l.textContent = on ? 'SYNCED' : 'SYNC';
-    var s = $('syncbtn');
-    if (s) s.classList.toggle('on', on);
-  }
+  window.__S = S;
 
-  function toggleSync() {
-    S.synced = !S.synced;
-    if (S.synced) {
-      if (S.ws && S.ws.readyState === 1) {
-        S.ws.send(JSON.stringify({ type: 'need-station' }));
-      }
-      claimLead();
-    } else {
-      S.leader = false;
-      S.station = null;
-      if (S.ws && S.ws.readyState === 1) {
-        S.ws.send(JSON.stringify({ type: 'leave' }));
-      }
-      if (desired && player) {
-        try { if (player.getPlayerState && player.getPlayerState() === 2) player.playVideo(); } catch (e) {}
-      }
-    }
-    syncBadge();
+  function syncBadge() {
+    var on = S.state === 'follower' || (S.state === 'leader' && S.peers > 0);
+    var b = $('sync');
+    if (!b) return;
+    b.textContent = on ? 'SYNCED' : 'SOLO';
+    b.classList.toggle('on', on);
   }
 
   function stationExpected(m) {
     return m.playing ? m.t0 + (Date.now() - m.at) / 1000 : null;
+  }
+
+  function isPlaying() {
+    try { return player.getPlayerState() === 1; } catch (e) { return false; }
+  }
+
+  function stationMsg() {
+    var d = player.getVideoData && player.getVideoData();
+    if (!d || !d.video_id) return null;
+    return JSON.stringify({
+      type: 'station', videoId: d.video_id,
+      t0: player.getCurrentTime ? player.getCurrentTime() : 0,
+      at: Date.now(), playing: isPlaying(), leaderId: S.clientId
+    });
+  }
+
+  function broadcastStation(except) {
+    var body = stationMsg();
+    if (!body) return;
+    for (var i = 0; i < S.conns.length; i++) {
+      var c = S.conns[i];
+      if (c !== except && c.open) { try { c.send(body); } catch (e) {} }
+    }
+  }
+
+  function sendToLeader(m) {
+    if (S.conn && S.conn.open) { try { S.conn.send(JSON.stringify(m)); } catch (e) {} }
+  }
+
+  function onConnData(conn, raw) {
+    var m;
+    try { m = JSON.parse(raw); } catch (e) { return; }
+    if (!m) return;
+    if (m.type === 'hello' && S.leader) {
+      var body = stationMsg();
+      if (body && conn.open) { try { conn.send(body); } catch (e) {} }
+      return;
+    }
+    if (S.leader && m.type === 'cmd') { handleCmd(m.cmd); return; }
+    if (!S.leader && m.type === 'station') {
+      S.station = m;
+      followStation(m);
+    }
+  }
+
+  /* the room: one device owns the id and is the DJ, everyone else follows */
+  function openRoom() {
+    if (S.state !== 'none') return;
+    S.state = 'claiming';
+    var p = new Peer(ROOM);
+    S.peer = p;
+    p.on('open', function () {
+      S.state = 'leader';
+      S.leader = true;
+      if (apiReady) broadcastStation();
+      syncBadge();
+    });
+    p.on('connection', function (conn) {
+      conn.on('data', function (raw) { onConnData(conn, raw); });
+      conn.on('close', function () { removeConn(conn); });
+      conn.on('error', function () { removeConn(conn); });
+      S.conns.push(conn);
+      S.peers = S.conns.length;
+      syncBadge();
+    });
+    p.on('error', function (err) {
+      if (err.type === 'unavailable-id') {
+        /* someone else owns the room — join them as a listener */
+        if (S.peer) { try { S.peer.destroy(); } catch (e) {} }
+        S.peer = null;
+        S.state = 'connecting';
+        joinRoom();
+      }
+    });
+  }
+
+  function removeConn(conn) {
+    var i = S.conns.indexOf(conn);
+    if (i >= 0) S.conns.splice(i, 1);
+    S.peers = S.conns.length;
+    syncBadge();
+  }
+
+  function joinRoom() {
+    if (!S.peer) {
+      var p = new Peer();
+      S.peer = p;
+      p.on('error', function () { /* retry cycle below */ });
+    }
+    var peer = S.peer;
+    var started = false;
+    var start = function () {
+      if (started || S.state !== 'connecting') return;
+      started = true;
+      var conn = peer.connect(ROOM, { reliable: true });
+      S.conn = conn;
+      var lost = false;
+      var onLost = function () {
+        if (lost) return;
+        lost = true;
+        S.conn = null;
+        S.station = null;
+        S.leader = false;
+        syncBadge();
+        if (S.peer) { try { S.peer.destroy(); } catch (e) {} }
+        S.peer = null;
+        S.state = 'none';
+        setTimeout(openRoom, 600 + Math.random() * 2400);
+      };
+      conn.on('open', function () {
+        S.state = 'follower';
+        S.leader = false;
+        S.joinedAt = Date.now();
+        syncBadge();
+        try { conn.send(JSON.stringify({ type: 'hello', clientId: S.clientId })); } catch (e) {}
+      });
+      conn.on('data', function (raw) { onConnData(conn, raw); });
+      conn.on('close', onLost);
+      conn.on('error', onLost);
+    };
+    if (peer.id) {
+      start();
+    } else {
+      peer.on('open', start);
+    }
+  }
+
+  function loadPeerJs() {
+    return new Promise(function (res, rej) {
+      if (window.Peer) { res(); return; }
+      var s = document.createElement('script');
+      s.src = 'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js';
+      s.async = true;
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  function handleCmd(cmd) {
+    if (!apiReady || !player) return;
+    if (cmd === 'next' || cmd === 'prev') { skip(cmd); return; }
+    if (cmd === 'play') { desired = true; try { player.playVideo(); } catch (e) {} return; }
+    if (cmd === 'pause') { desired = false; try { player.pauseVideo(); } catch (e) {} return; }
   }
 
   function followStation(m) {
@@ -70,64 +197,7 @@
     } catch (e) {}
   }
 
-  function sendClaim() {
-    if (!S.ws || S.ws.readyState !== 1 || !player) return;
-    var d = player.getVideoData && player.getVideoData();
-    if (!d || !d.video_id) return;
-    S.ws.send(JSON.stringify({
-      type: 'claim', clientId: S.clientId, videoId: d.video_id,
-      t: player.getCurrentTime ? player.getCurrentTime() : 0
-    }));
-  }
-
-  function claimLead() {
-    if (!S.synced || !S.connected || !S.station || S.station.leaderId || S.leader) return;
-    var d = player.getVideoData && player.getVideoData();
-    if (!d || !d.video_id) return;
-    var st = -1;
-    try { st = player.getPlayerState(); } catch (e) {}
-    if (st !== 1) return;
-    S.leader = true;
-    sendClaim();
-  }
-
-  function sendState(playing) {
-    if (!S.ws || S.ws.readyState !== 1 || !player) return;
-    var d = player.getVideoData && player.getVideoData();
-    if (!d || !d.video_id) return;
-    S.ws.send(JSON.stringify({
-      type: 'state', clientId: S.clientId, videoId: d.video_id,
-      t: player.getCurrentTime ? player.getCurrentTime() : 0, playing: playing
-    }));
-  }
-
-  function connectSync() {
-    try {
-      var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
-      S.ws = new WebSocket(proto + location.host + '/ws');
-    } catch (e) { syncBadge(); return; }
-    S.ws.onopen = function () { S.connected = true; syncBadge(); };
-    S.ws.onmessage = function (ev) {
-      var m;
-      try { m = JSON.parse(ev.data); } catch (e) { return; }
-      if (m.type === 'cmd' && (m.cmd === 'next' || m.cmd === 'prev') && S.synced) { skip(m.cmd); return; }
-      if (!m || m.type !== 'station') return;
-      if (!S.synced) return;
-      var wasLeader = S.leader;
-      S.station = m;
-      S.leader = m.leaderId === S.clientId;
-      if (S.leader) {
-        if (!wasLeader) sendState(true);
-        return;
-      }
-      followStation(m);
-    };
-    S.ws.onclose = function () {
-      S.connected = false; S.leader = false; S.station = null; syncBadge();
-      setTimeout(connectSync, 3000);
-    };
-    S.ws.onerror = function () { try { S.ws.close(); } catch (e) {} };
-  }
+  /* ---------- player ---------- */
 
   function loadApi() {
     return new Promise(function (res, rej) {
@@ -176,11 +246,16 @@
       document.body.classList.add('playing');
       desired = true;
       update();
-      if (S.leader) sendState(true);
-      else if (S.synced && S.connected && S.station && !S.station.leaderId) claimLead();
+      if (S.leader) broadcastStation();
+      else if (S.state === 'follower' && S.station && !S.station.playing) {
+        sendToLeader({ type: 'cmd', cmd: 'play' });
+      }
     } else if (e.data === YT.PlayerState.PAUSED) {
       document.body.classList.remove('playing');
-      if (S.leader) sendState(false);
+      if (S.leader) broadcastStation();
+      else if (S.state === 'follower' && S.station && S.station.playing) {
+        sendToLeader({ type: 'cmd', cmd: 'pause' });
+      }
     }
   }
 
@@ -218,11 +293,12 @@
             $('prev').disabled = false;
             $('next').disabled = false;
             show('s-ready');
-            if (S.synced && S.station && S.station.videoId) {
+            if (S.state === 'follower' && S.station && S.station.videoId) {
               followStation(S.station);
             } else if (desired) {
               try { player.playVideo(); } catch (e) {}
             }
+            if (S.leader) broadcastStation();
             update();
           },
           onStateChange: onState,
@@ -238,8 +314,8 @@
   /* skip a track without detaching the playlist */
   function skip(dir) {
     if (!apiReady || !player) return;
-    if (S.synced && !S.leader && S.connected && S.station && S.station.leaderId) {
-      try { S.ws.send(JSON.stringify({ type: 'cmd', cmd: dir })); } catch (e) {}
+    if (!S.leader && S.state === 'follower') {
+      sendToLeader({ type: 'cmd', cmd: dir });
       return;
     }
     try {
@@ -257,6 +333,25 @@
     setTimeout(update, 500);
   }
 
+  /* ---------- UI ---------- */
+
+  function toggleFullscreen() {
+    var d = document;
+    try {
+      if (!d.fullscreenElement) {
+        if (d.documentElement.requestFullscreen) d.documentElement.requestFullscreen().catch(function () {});
+        else if (d.documentElement.webkitRequestFullscreen) d.documentElement.webkitRequestFullscreen();
+      } else {
+        if (d.exitFullscreen) d.exitFullscreen();
+        else if (d.webkitExitFullscreen) d.webkitExitFullscreen();
+      }
+    } catch (e) {}
+  }
+
+  function fsIcon() {
+    document.body.classList.toggle('fs-on', !!document.fullscreenElement || !!document.webkitFullscreenElement);
+  }
+
   $('play').addEventListener('click', function () {
     if (!apiReady) return;
     desired = !desired;
@@ -264,38 +359,36 @@
   });
   $('prev').addEventListener('click', function () { skip('prev'); });
   $('next').addEventListener('click', function () { skip('next'); });
-  $('syncbtn').addEventListener('click', toggleSync);
+  $('fsbtn').addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', fsIcon);
+  document.addEventListener('webkitfullscreenchange', fsIcon);
   $('retry').addEventListener('click', function () { errs = 0; init(); });
 
   setInterval(function () { if (document.visibilityState === 'visible') resync(); }, 15 * 60 * 1000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) resync(); });
 
-  /* sync loops: leader heartbeat + follower drift correction */
+  /* ---------- sync loops ---------- */
+
+  /* leader heartbeat: keep the station clock fresh */
   setInterval(function () {
-    if (!S.leader || !S.connected) return;
-    var st = -1;
-    try { st = player.getPlayerState(); } catch (e) {}
-    sendState(st === 1);
+    if (S.leader) broadcastStation();
   }, 8000);
 
   /* play watchdog: retry playVideo until audio actually starts */
   var playRetries = 0;
   setInterval(function () {
     if (!apiReady || !desired) return;
-    if (S.synced && S.station && S.station.videoId && !S.station.playing) return;
+    if (S.state === 'follower' && S.station && S.station.videoId && !S.station.playing) return;
     var st = -1;
     try { st = player.getPlayerState(); } catch (e) {}
     if (st === 1 || st === 3) { playRetries = 0; return; }
     ++playRetries;
     try { player.playVideo(); } catch (e) {}
   }, 2000);
+
+  /* follower drift correction */
   setInterval(function () {
-    if (!S.synced || !S.connected || S.leader || !S.station) return;
-    if (!S.station.leaderId) {
-      try { if (player.getPlayerState() === 1) claimLead(); } catch (e) {}
-      return;
-    }
-    if (!S.station.playing) return;
+    if (S.state !== 'follower' || !S.station || !S.station.playing) return;
     var exp = stationExpected(S.station);
     if (exp === null) return;
     try {
@@ -304,6 +397,20 @@
     } catch (e) {}
   }, 10000);
 
-  connectSync();
+  /* takeover watchdog: leader silent too long -> drop it and try to claim the room */
+  setInterval(function () {
+    if (S.state !== 'follower') return;
+    var silent = S.station ? Date.now() - S.station.at : Date.now() - (S.joinedAt || 0);
+    if (silent > 15000) {
+      if (S.conn) { try { S.conn.close(); } catch (e) {} }
+    }
+  }, 5000);
+
+  loadPeerJs().then(openRoom).catch(function () {
+    setTimeout(function () {
+      loadPeerJs().then(openRoom).catch(function () {});
+    }, 30000);
+  });
+
   init();
 })();

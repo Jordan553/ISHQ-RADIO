@@ -171,27 +171,9 @@ body.playing .play .icon-play{ display:none; }
 }
 .side:active:not(:disabled){ transform:scale(.9); }
 .side:disabled{ opacity:.35; cursor:default; }
-
-/* sync toggle: pill next to the transport */
-.syncbtn{
-  display:flex; align-items:center; gap:7px;
-  padding:10px 16px; border-radius:999px; cursor:pointer;
-  border:1px solid rgba(255,255,255,.08); background:transparent;
-  color:var(--muted); font-family:inherit; font-size:10px; letter-spacing:.26em;
-  transition:border-color .25s, color .25s, background .25s, box-shadow .25s, transform .15s;
-}
-.syncbtn svg{ width:14px; height:14px; fill:currentColor; flex:none; }
-.syncbtn:hover{ color:var(--fg); border-color:rgba(255,255,255,.4); background:rgba(255,255,255,.04); }
-.syncbtn:active{ transform:scale(.93); }
-.syncbtn.on{
-  color:#8df09a; border-color:rgba(141,240,154,.45);
-  background:rgba(141,240,154,.07); box-shadow:0 0 24px rgba(141,240,154,.12);
-}
-@media (max-width:640px){
-  .controls{ gap:18px; }
-  .syncbtn span{ display:none; }
-  .syncbtn{ padding:12px; }
-}
+.side .icon-compress{ display:none; }
+body.fs-on .side .icon-compress{ display:block; }
+body.fs-on .side .icon-expand{ display:none; }
 
 /* states */
 .state{ display:none; flex-direction:column; align-items:center; gap:16px; text-align:center; }
