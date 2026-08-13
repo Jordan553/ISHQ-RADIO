@@ -340,41 +340,18 @@ export const useStore = create((set, get) => ({
   },
 
   /** Fullscreen vibe — the video of the current song fills the screen. */
-  async openVibeFs() {
+  openVibeFs() {
     const s = get();
-    if (s.onlineNow) { set({ vibeFsOpen: true }); return; }
-
-    // local song — play its video MUTED as visuals while the MP3 keeps the audio
-    const track = s.playlist[s.live?.currentSongIndex] || s.playlist[0];
-    if (!track) { pushToast('Nothing playing yet', 'warn'); return; }
-    if (!s.ytReady) {
-      pushToast('YouTube engine still warming up — try again in a few seconds', 'warn');
-      return;
+    if (s.vibeFsOpen) return;
+    if (!s.vibe) {
+      storage.set('ishq.vibe', true);
+      set({ vibe: true });
     }
-    const start = (vid) => {
-      if (!vid) { pushToast('No video found for this song', 'warn'); return; }
-      ytPlayer.loadVideo(vid, Math.floor(s.currentTime || 0));
-      ytPlayer.mute();
-      if (s.audioPlaying) ytPlayer.play();
-      set({ vibeFsVideo: vid, vibeFsOpen: true });
-    };
-    const cached = s.videoFor?.[track.id] || track.videoId;
-    if (cached) { start(cached); return; }
-    // find & cache a video for this track (title + artist search)
-    try {
-      const res = await fetch(`/search-online?q=${encodeURIComponent(`${track.title} ${track.artist || ''}`.trim())}`);
-      const { results } = await res.json().catch(() => ({}));
-      const vid = results?.[0]?.videoId || null;
-      if (vid) {
-        const videoFor = { ...get().videoFor, [track.id]: vid };
-        storage.set('ishq.videoFor', videoFor);
-        set({ videoFor });
-      }
-      if (get().vibeFsOpen) return; // closed while searching
-      start(vid);
-    } catch {
-      start(null);
+    set({ vibeFsOpen: true });
+    if (!s.onlineNow && !s.ytReady) {
+      pushToast('YouTube engine is warming up — video will pop in when ready', 'info');
     }
+    get().vibeLoadVisuals();
   },
 
   closeVibeFs() {
@@ -385,6 +362,52 @@ export const useStore = create((set, get) => ({
       set({ vibeFsVideo: null });
     }
     set({ vibeFsOpen: false });
+  },
+
+  /**
+   * (Re)load the muted visuals for the current track while fullscreen is
+   * open — online songs use their own video; local songs load a muted
+   * copy of their video (track.videoId, else a one-shot YouTube search
+   * cached in localStorage) while the MP3 keeps the audio.
+   */
+  async vibeLoadVisuals() {
+    const s = get();
+    if (!s.vibeFsOpen) return;
+    if (s.onlineNow) { set({ vibeFsVideo: null }); return; }
+    const track = s.playlist[s.live?.currentSongIndex] || s.playlist[0];
+    if (!track) return;
+    const start = (vid) => {
+      if (!vid) {
+        const st = get();
+        if (st.vibeFsOpen) set({ vibeFsVideo: null });
+        pushToast('No video found for this song', 'warn');
+        return;
+      }
+      try {
+        ytPlayer.loadVideo(vid, Math.floor(get().currentTime || 0));
+        ytPlayer.mute();
+        if (get().audioPlaying) ytPlayer.play();
+        set({ vibeFsVideo: vid });
+      } catch {
+        set({ vibeFsVideo: vid });
+      }
+    };
+    const cached = s.videoFor?.[track.id] || track.videoId;
+    if (cached) { start(cached); return; }
+    try {
+      const res = await fetch(`/search-online?q=${encodeURIComponent(`${track.title} ${track.artist || ''}`.trim())}`);
+      const { results } = await res.json().catch(() => ({}));
+      const vid = results?.[0]?.videoId || null;
+      if (vid) {
+        const videoFor = { ...get().videoFor, [track.id]: vid };
+        storage.set('ishq.videoFor', videoFor);
+        set({ videoFor });
+      }
+      if (!get().vibeFsOpen) return; // closed while searching
+      start(vid);
+    } catch {
+      start(null);
+    }
   },
 
   /**

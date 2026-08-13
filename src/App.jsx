@@ -37,7 +37,6 @@ export default function App() {
   const ready = useStore((s) => s.ready);
   const railTab = useStore((s) => s.railTab);
   const theaterOpen = useStore((s) => s.theaterOpen);
-  const joinNeeded = useStore((s) => s.joinNeeded);
   const bgTheme = useStore((s) => s.bgTheme);
   const dark = useStore((s) => s.dark);
   const listeners = useStore((s) => s.listeners);
@@ -72,8 +71,14 @@ export default function App() {
     window.__ishqYt = ytPlayer;
     bootstrap();
 
-    // autoplay attempt — browsers usually block it; the gate handles the rest
+    // autoplay attempt — browsers usually block it; the gate handles the rest.
+    // IMPORTANT: only run ONCE at boot. Running it on every audio 'ready'
+    // (i.e. every track change) made a single play() hiccup flip joinNeeded
+    // and silently unmount the fullscreen overlays.
+    let autoTried = false;
     const tryAuto = () => {
+      if (autoTried) return;
+      autoTried = true;
       const { inLive, live } = useStore.getState();
       if (inLive && live?.isPlaying) {
         audioEngine.playRaw().catch(() => useStore.setState({ joinNeeded: true }));
@@ -160,8 +165,9 @@ export default function App() {
       <SyncBanner />
       <SettingsModal />
       <ToastTray />
-      {!joinNeeded && <FullscreenLyrics />}
-      {!joinNeeded && <VibeFullscreen />}
+      {/* fullscreen overlays are never gate-dependent — joinNeeded must not unmount them */}
+      <FullscreenLyrics />
+      <VibeFullscreen />
       <VibeLayer />
 
       <Loader />

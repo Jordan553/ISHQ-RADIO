@@ -25,6 +25,12 @@ export default function VibeFullscreen() {
   const backToLive = useStore((s) => s.backToLive);
   const inLive = useStore((s) => s.inLive);
   const vibeFsVideo = useStore((s) => s.vibeFsVideo);
+  const vibeLoadVisuals = useStore((s) => s.vibeLoadVisuals);
+
+  // keep the muted visuals in step when the song changes (Next/Prev/live)
+  useEffect(() => {
+    if (open) vibeLoadVisuals();
+  }, [open, track?.id, vibeLoadVisuals]);
 
   useEffect(() => {
     document.body.classList.toggle('vibe-fs', open);

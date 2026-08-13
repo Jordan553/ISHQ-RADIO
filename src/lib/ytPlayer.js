@@ -22,6 +22,7 @@ class YtPlayer {
     this.currentStart = 0;
     this._pending = null;
     this._apiPromise = null;
+    this._muted = false; // remembered even before the player is ready
     this._handlers = { ready: new Set(), state: new Set(), end: new Set(), error: new Set() };
   }
 
@@ -77,6 +78,7 @@ class YtPlayer {
       events: {
         onReady: () => {
           this.ready = true;
+          if (this._muted) this.player.mute();
           if (this._pending) {
             const p = this._pending;
             this._pending = null;
@@ -105,6 +107,7 @@ class YtPlayer {
       this._pending = { videoId, startSeconds: this.currentStart };
       return;
     }
+    if (this._muted) this.player.mute();
     this.player.loadVideoById({
       videoId,
       startSeconds: this.currentStart,
@@ -128,6 +131,7 @@ class YtPlayer {
   }
   /** Mute — used for visuals-only playback (local MP3 keeps the audio). */
   mute() {
+    this._muted = true;
     if (this.ready) this.player.mute?.();
   }
 
@@ -145,6 +149,7 @@ class YtPlayer {
     return this.state() === YT_STATE.PLAYING || this.state() === YT_STATE.BUFFERING;
   }
   setVolume(v) {
+    this._muted = false;
     if (this.ready) {
       this.player.unMute?.();
       this.player.setVolume?.(Math.round(Math.min(1, Math.max(0, v)) * 100));

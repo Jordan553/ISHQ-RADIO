@@ -195,16 +195,14 @@ export default function TopBar() {
           <span>Vibe</span>
         </button>
 
-        {vibe && (
-          <button
-            className="icon-btn vibe-fs-btn"
-            aria-label="Vibe fullscreen"
-            title="Vibe fullscreen — the video fills the screen"
-            onClick={openVibeFs}
-          >
-            <i className="fa-solid fa-expand" />
-          </button>
-        )}
+        <button
+          className="icon-btn vibe-fs-btn"
+          aria-label="Vibe fullscreen"
+          title="Vibe fullscreen — the video fills the screen"
+          onClick={openVibeFs}
+        >
+          <i className="fa-solid fa-expand" />
+        </button>
 
         <button
           className={`icon-btn${party ? ' on' : ''}`}

@@ -907,7 +907,7 @@ select.text-input option { background: #16110f; color: var(--text); }
 }
 
 .join-gate {
-  position: fixed; inset: 0; z-index: 210;
+  position: fixed; inset: 0; z-index: 130;
   display: none;
   flex-direction: column; align-items: center; justify-content: center;
   gap: 24px;
