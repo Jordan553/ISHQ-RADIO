@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from '../store/useStore.js';
 import PlayerProgress from './PlayerProgress.jsx';
 import { fmtTime } from '../lib/lrcParser.js';
@@ -26,6 +26,33 @@ export default function VibeFullscreen() {
   const inLive = useStore((s) => s.inLive);
   const vibeFsVideo = useStore((s) => s.vibeFsVideo);
   const vibeLoadVisuals = useStore((s) => s.vibeLoadVisuals);
+  const [barOn, setBarOn] = useState(true);
+
+  // auto-hide the controls bar after idle — any mouse/touch/key brings it back
+  useEffect(() => {
+    if (!open) return;
+    setBarOn(true);
+    let t = setTimeout(() => setBarOn(false), 3000);
+    const kick = () => {
+      clearTimeout(t);
+      setBarOn(true);
+      t = setTimeout(() => setBarOn(false), 3000);
+    };
+    window.addEventListener('mousemove', kick);
+    window.addEventListener('touchstart', kick);
+    window.addEventListener('keydown', kick);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('mousemove', kick);
+      window.removeEventListener('touchstart', kick);
+      window.removeEventListener('keydown', kick);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    document.body.classList.toggle('vibe-fs-idle', open && !barOn);
+    return () => document.body.classList.remove('vibe-fs-idle');
+  }, [open, barOn]);
 
   // keep the muted visuals in step when the song changes (Next/Prev/live)
   useEffect(() => {
@@ -74,7 +101,7 @@ export default function VibeFullscreen() {
         {vibeFsVideo && <span className="vibe-fs-note">visuals · audio from Drive</span>}
       </div>
 
-      <div className="vibe-fs-bar">
+      <div className={'vibe-fs-bar' + (barOn ? ' visible' : '')}>
         <div className="vibe-fs-progress"><PlayerProgress /></div>
         <div className="vibe-fs-controls">
           <button className="ctrl-btn" onClick={localPrev} aria-label="Previous">
