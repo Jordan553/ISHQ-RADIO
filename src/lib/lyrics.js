@@ -41,6 +41,12 @@ export async function fetchLrc(track) {
   const title = String(track.title || '').trim();
   const artist = String(track.artist || '').trim();
   if (!title) return { lrc: null, status: 'missing', source: null };
+
+  // static map fallback — the Drive copy may live under a different id
+  // than the key it was authored under; match by title (or title+artist).
+  const match = matchStaticByTitle(title, artist);
+  if (match) return { lrc: parseLrc(match), status: 'ok', source: 'static' };
+
   const key = `${title.toLowerCase()}|${artist.toLowerCase()}`;
   if (lrcInflight.has(key)) return lrcInflight.get(key);
 
@@ -89,6 +95,34 @@ export async function fetchLrc(track) {
 
   lrcInflight.set(key, job);
   return job;
+}
+
+/* ------------------------- static title matching ------------------------- */
+/* The static LYRICS map is keyed by id; a re-uploaded Drive file can carry a
+ * different id, so index the map by the [ti:]/[ar:] tags (built lazily). */
+const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+let staticLrcIndex = null;
+
+function buildStaticIndex() {
+  const idx = {};
+  for (const [id, text] of Object.entries(LYRICS)) {
+    const ti = /\[ti:([^\]]*)\]/i.exec(text);
+    if (!ti || !ti[1].trim()) continue;
+    const ar = /\[ar:([^\]]*)\]/i.exec(text);
+    const t = ti[1].trim();
+    const a = (ar?.[1] || '').trim();
+    idx[norm(`${t}|${a}`)] = id;
+    if (!idx[norm(t)]) idx[norm(t)] = id; // title-only, only when no exact pair
+  }
+  return idx;
+}
+
+function matchStaticByTitle(title, artist) {
+  if (!staticLrcIndex) staticLrcIndex = buildStaticIndex();
+  const exact = staticLrcIndex[norm(`${title}|${artist}`)];
+  if (exact) return LYRICS[exact];
+  const byTitle = staticLrcIndex[norm(title)];
+  return byTitle ? LYRICS[byTitle] : null;
 }
 
 export const LYRICS = {

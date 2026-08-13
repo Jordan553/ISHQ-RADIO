@@ -571,6 +571,22 @@ body.vibe-fs .yt-frame {
   color: #ffeef0;
   text-shadow: 0 3px 30px rgba(0, 0, 0, 0.95), 0 0 60px rgba(255, 90, 110, 0.55);
 }
+
+/* lyrics still loading — soft pulse, no quote flash */
+.bl-loading {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-lrc);
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 30px);
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.9);
+  animation: bl-loading-pulse 1.8s ease-in-out infinite;
+}
+.bl-loading i { color: var(--red-soft); font-size: 0.8em; }
+@keyframes bl-loading-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
 body.vibe-fs #app {
   opacity: 0;
   pointer-events: none;

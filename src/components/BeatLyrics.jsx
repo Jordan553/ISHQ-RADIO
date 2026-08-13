@@ -82,6 +82,11 @@ export default function BeatLyrics({ nudger = false, showMeta = true }) {
           </div>
           <div className="bl-line next">{lines[Math.min(lines.length - 1, li + 1)]?.text || '\u00A0'}</div>
         </div>
+      ) : !meta || meta?.status === 'loading' || meta?.status === 'pending' ? (
+        <div className="bl-loading" key={track.id || 'l'}>
+          <i className="fa-solid fa-music" />
+          <span>finding lyrics…</span>
+        </div>
       ) : (
         <div className="bl-quote" key={track.id || 'q'}>&ldquo;{quote}&rdquo;</div>
       )}
