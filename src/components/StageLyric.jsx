@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store/useStore.js';
-import { activeLineIndex } from '../lib/lrcParser.js';
+import { activeLineIndex, lyricOffset } from '../lib/lrcParser.js';
 import { useLrc } from '../hooks/useLrc.js';
 
 /**
  * The stage karaoke line — ONLY the line that is playing right now,
  * synced to the track clock, fading in below the album art.
  * Silent (no placeholder) until synced lyrics actually arrive.
+ * Honors the per-track lyric offset saved from the theater nudger.
  */
 export default function StageLyric() {
   const playlist = useStore((s) => s.playlist);
@@ -20,7 +21,7 @@ export default function StageLyric() {
   const lrc = meta?.lrc;
   const lines = lrc?.lines || [];
   const synced = lrc?.meta?.synced !== false;
-  const idx = synced && lines.length ? activeLineIndex(lines, currentTime, 0) : -1;
+  const idx = synced && lines.length ? activeLineIndex(lines, currentTime - lyricOffset(track?.id), 0) : -1;
 
   const shownRef = useRef(-1);
   const [text, setText] = useState('');

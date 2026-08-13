@@ -429,6 +429,61 @@ body.midnight .rail .vibe-widget { background: rgba(255, 255, 255, 0.02); }
   background: rgba(255, 42, 75, 0.15);
 }
 
+/* ---------- theater: word-by-word karaoke + lyric sync nudger ---------- */
+.beat-lyrics .bl-lines { gap: 16px; max-width: 86vw; }
+.bl-line.now {
+  display: flex; flex-wrap: wrap;
+  justify-content: center; align-items: baseline;
+  row-gap: 0.35em; column-gap: 0.22em;
+  max-width: 86vw;
+  font-size: clamp(34px, 5.2vw, 58px);
+  line-height: 1.35;
+}
+.bl-word {
+  opacity: 0.3;
+  color: #ffeef0;
+  text-shadow: none;
+  transition: opacity 0.22s var(--ease), color 0.22s var(--ease), text-shadow 0.22s var(--ease);
+}
+.bl-word.on {
+  opacity: 1;
+  color: #fff;
+  text-shadow: 0 0 30px rgba(255, 42, 75, 0.9), 0 0 80px rgba(255, 42, 75, 0.4);
+}
+.bl-nudge {
+  position: absolute;
+  bottom: calc(64px + env(safe-area-inset-bottom) + 22px);
+  left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  background: rgba(8, 5, 10, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  opacity: 0.75;
+  transition: opacity 0.25s var(--ease);
+}
+.bl-nudge:hover { opacity: 1; }
+.bl-nudge .icon-btn {
+  width: 26px; height: 26px; font-size: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.bl-nudge .icon-btn:hover { border-color: rgba(255, 42, 75, 0.6); }
+.bl-nudge-label {
+  font-size: 9.5px; letter-spacing: 2.2px; font-weight: 700;
+  color: var(--muted);
+}
+.bl-nudge-val {
+  font-size: 12px; font-weight: 700;
+  min-width: 52px; text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.85);
+}
+.bl-nudge-val.late { color: #ffd76a; }
+.bl-nudge-val.early { color: #7fd7ff; }
+
 /* ---------- seasoning ---------- */
 .song-dedication { background: rgba(255, 59, 87, 0.07); }
 .online-count.hearts-now i { color: var(--red-soft); }

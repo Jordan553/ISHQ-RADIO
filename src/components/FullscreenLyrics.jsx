@@ -63,7 +63,7 @@ export default function FullscreenLyrics() {
   return (
     <div className={`theater open`} role="dialog" aria-modal="true" aria-label="Fullscreen lyrics">
       <CinemaBackground />
-      <BeatLyrics />
+      <BeatLyrics nudger />
       <button className="icon-btn theater-close" onClick={closeTheater} aria-label="Close fullscreen lyrics">
         <i className="fa-solid fa-xmark" />
       </button>

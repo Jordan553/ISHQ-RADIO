@@ -77,3 +77,40 @@ export function fmtTime(sec, showTenth = false) {
   const tenth = showTenth ? `.${Math.floor((sec % 1) * 10)}` : '';
   return `${m}:${String(s).padStart(2, '0')}${tenth}`;
 }
+
+/* ------------------------------ lyric sync nudging ------------------------------ */
+/* Some YouTube copies have a longer intro than the LRC timestamps (and the Drive
+ * master). Every track can carry a manual offset that is remembered across
+ * sessions — the theater nudger writes it, every lyric surface reads it. */
+const KEY = 'ishq.lyricOffsets';
+
+function offsetMap() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
+}
+
+export function lyricOffset(trackId) {
+  if (!trackId) return 0;
+  return offsetMap()[trackId] || 0;
+}
+
+export function setLyricOffset(trackId, offset, reset = false) {
+  if (!trackId) return;
+  const map = offsetMap();
+  if (reset || offset === 0) delete map[trackId];
+  else {
+    map[trackId] = Math.max(-10, Math.min(10, Math.round(offset * 100) / 100));
+  }
+  try { localStorage.setItem(KEY, JSON.stringify(map)); } catch { /* storage full */ }
+}
+
+/* ------------------------------ word-level karaoke ------------------------------ */
+/* A line's words are assumed to be sung evenly across the line's duration.
+ * Returns [{ word, start }] so a renderer can light up each word in turn. */
+export function wordTimings(lineTime, nextLineTime, text) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  const start = lineTime;
+  const end = nextLineTime != null && nextLineTime > lineTime ? nextLineTime : lineTime + 3;
+  const dur = Math.max(0.45, end - start);
+  return words.map((word, i) => ({ word, start: start + (dur / words.length) * i }));
+}
