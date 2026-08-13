@@ -39,6 +39,7 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -132,6 +133,7 @@ img { display: block; max-width: 100%; }
   grid-template-columns: var(--sidebar-w) 1fr;
   grid-template-rows: var(--topbar-h) 1fr;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 #app.ready { opacity: 1; }
@@ -486,6 +488,7 @@ img { display: block; max-width: 100%; }
   min-width: 0;
   display: flex; flex-direction: column;
   max-height: calc(100vh - var(--topbar-h) - 48px);
+  max-height: calc(100dvh - var(--topbar-h) - 48px);
   position: sticky;
   align-self: start;
   top: calc(var(--topbar-h) + 24px);
@@ -758,6 +761,9 @@ img { display: block; max-width: 100%; }
 .modal-head h2 i { color: var(--red-soft); font-size: 17px; }
 .modal-body { padding: 18px 24px 26px; }
 .setting-group { padding: 14px 0; border-bottom: 1px solid var(--stroke); display: flex; flex-direction: column; gap: 10px; }
+.setting-group h3 small { font-size: 10px; color: var(--muted); letter-spacing: 0.5px; text-transform: none; }
+.fb-steps { margin: 0; padding-left: 18px; font-size: 11.5px; color: var(--muted); line-height: 1.7; }
+.fb-steps b { color: var(--text); }
 .setting-group:last-child { border-bottom: 0; }
 .setting-group h3 { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: var(--red-soft); text-transform: uppercase; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }

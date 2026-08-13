@@ -182,9 +182,9 @@ async function innertubeAudio(videoId, clientName, clientVersion, sdk) {
       client: {
         clientName,
         clientVersion,
-        androidSdkVersion: sdk,
         hl: 'en',
         gl: 'US',
+        ...(sdk != null ? { androidSdkVersion: sdk } : {}),
         ...(vd ? { visitorData: vd } : {})
       }
     },
@@ -194,7 +194,9 @@ async function innertubeAudio(videoId, clientName, clientVersion, sdk) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': YT_PLAYER_UA,
+      'User-Agent': clientName === 'IOS'
+        ? 'com.google.ios.youtube/19.29.1 (iPhone; U; CPU iPhone OS 17_0 like Mac OS X; en_US)'
+        : YT_PLAYER_UA,
       'Accept-Encoding': 'identity'
     },
     body: JSON.stringify(body),
@@ -220,7 +222,11 @@ async function resolveStreamUrl(videoId) {
 
   let url = null;
   const picks = [];
-  for (const c of [{ n: 'ANDROID_VR', v: '1.61.21', s: 30 }, { n: 'ANDROID', v: '19.12.37', s: 30 }]) {
+  for (const c of [
+    { n: 'ANDROID_VR', v: '1.61.21', s: 30 },
+    { n: 'ANDROID', v: '19.12.37', s: 30 },
+    { n: 'IOS', v: '19.29.1', s: null }
+  ]) {
     const u = await innertubeAudio(videoId, c.n, c.v, c.s);
     if (u) picks.push(u);
   }

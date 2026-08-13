@@ -15,7 +15,7 @@
  * Host actions mutate the state here; listeners follow it automatically.
  */
 
-import { CONFIG, storage } from './config.js';
+import { CONFIG, storage, resolveFirebaseConfig } from './config.js';
 
 const BC_NAME = 'ishq-live-v1';
 const STATE_KEY = 'ishq.live.state.v2';
@@ -89,15 +89,17 @@ class SyncEngine {
   /* ------------------------------------------------ provider */
   connectProvider() {
     this.teardownProvider();
-    if (CONFIG.firebase.enabled) {
+    const fb = resolveFirebaseConfig();
+    if (fb) {
       this.provider = 'firebase';
       import('./firebaseProvider.js').then((mod) =>
-        mod.connect(this, CONFIG.firebase)
+        mod.connect(this, { ...CONFIG.firebase, config: fb })
       ).catch((e) => {
         console.warn('Firebase provider failed, falling back to broadcast.', e);
         this.connectBroadcast();
       });
     } else {
+      this.provider = 'broadcast';
       this.connectBroadcast();
     }
   }
@@ -189,6 +191,7 @@ class SyncEngine {
       this.state = s;
       this.persist();
       this.broadcast();
+      this.firebaseWriteHost?.(this.state);
       this.emit('global', this.state);
       return;
     }
@@ -206,6 +209,7 @@ class SyncEngine {
         this.state = s;
         this.persist();
         this.broadcast();
+        this.firebaseWriteHost?.(this.state);
         this.emit('global', this.state);
       }
       return;
@@ -241,6 +245,7 @@ class SyncEngine {
     this.state = s;
     this.persist();
     this.broadcast();
+    this.firebaseWriteHost?.(this.state);
     this.emit('global', this.state);
   }
 

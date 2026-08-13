@@ -70,3 +70,29 @@ export const storage = {
     }
   }
 };
+
+/**
+ * Effective Firebase config — CONFIG.firebase.config merged with the
+ * dashboard override (Settings → Live Sync, stored as 'ishq.liveSync').
+ * Returns null when not actually configured, so the app falls back to
+ * BroadcastChannel sync instead of spamming a placeholder project.
+ */
+export function resolveFirebaseConfig() {
+  const fb = CONFIG.firebase;
+  if (!fb.enabled) return null;
+  const override = storage.get('ishq.liveSync', null);
+  const cfg = { ...fb.config, ...(override || {}) };
+  const real =
+    cfg.apiKey && !cfg.apiKey.startsWith('YOUR_') &&
+    cfg.databaseURL && cfg.databaseURL.includes('firebaseio') &&
+    cfg.projectId && !cfg.projectId.startsWith('YOUR_') &&
+    cfg.appId && !cfg.appId.startsWith('YOUR_');
+  if (!real) return null;
+  return {
+    apiKey: cfg.apiKey,
+    databaseURL: cfg.databaseURL,
+    projectId: cfg.projectId,
+    appId: cfg.appId,
+    authDomain: cfg.authDomain || `${cfg.projectId}.firebaseapp.com`
+  };
+}

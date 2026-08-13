@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '../store/useStore.js';
+import { storage, resolveFirebaseConfig } from '../lib/config.js';
 import { fmtTime } from '../lib/lrcParser.js';
 
 /** Settings modal — settings, info, and the Host (admin) control panel. */
@@ -30,6 +31,25 @@ export default function SettingsModal() {
 
   const [pass, setPass] = useState('');
   const [err, setErr] = useState('');
+  const ls = storage.get('ishq.liveSync', null);
+  const [fb, setFb] = useState(ls || { apiKey: '', databaseURL: '', projectId: '', appId: '' });
+  const [fbErr, setFbErr] = useState('');
+  const fbOn = !!resolveFirebaseConfig();
+  const projectName = () => resolveFirebaseConfig()?.projectId || '';
+
+  const saveLiveSync = () => {
+    const v = { apiKey: fb.apiKey.trim(), databaseURL: fb.databaseURL.trim(), projectId: fb.projectId.trim(), appId: fb.appId.trim() };
+    if (!v.apiKey || !v.projectId || !v.appId || !v.databaseURL.includes('firebaseio')) {
+      setFbErr('Chaaron fields bharo — Database URL aise hona chahiye: https://nama-default-rtdb.firebaseio.com');
+      return;
+    }
+    storage.set('ishq.liveSync', v);
+    location.reload();
+  };
+  const clearLiveSync = () => {
+    storage.set('ishq.liveSync', null);
+    location.reload();
+  };
 
   const tryUnlock = () => {
     if (!unlockAdmin(pass)) setErr('try ishq');
@@ -90,6 +110,45 @@ export default function SettingsModal() {
                 </button>
               </div>
             </div>
+          </div>
+
+          {/* ---------- live sync (cross-device) ---------- */}
+          <div className="setting-group">
+            <h3><i className="fa-solid fa-globe" /> Live Sync <small>har phone pe same song</small></h3>
+            {fbOn ? (
+              <div className="admin-status on" style={{ marginBottom: 10 }}>
+                <i className="fa-solid fa-tower-broadcast" />
+                Live sync ON — {projectName()} se juda. Ab sab devices same song
+                pe sync rahenge.
+              </div>
+            ) : (
+              <>
+                <p style={{ fontSize: 11.5, color: 'var(--muted)', marginBottom: 8 }}>
+                  Abhi sirf same browser ke tabs sync hote hain. Cross-device live
+                  radio ke liye free Firebase project ke 4 values chahiye:
+                </p>
+                <ol className="fb-steps">
+                  <li>firebase.google.com → <b>Get started</b> → project banao (free Spark plan)</li>
+                  <li>Build → <b>Realtime Database</b> → Create → Rules me dono <b>read/write = true</b> (public radio)</li>
+                  <li>Project settings → General → apni app ki values copy karo</li>
+                </ol>
+                <input className="text-input" style={{ marginTop: 8 }} placeholder="apiKey" value={fb.apiKey}
+                  onChange={(e) => setFb({ ...fb, apiKey: e.target.value })} />
+                <input className="text-input" style={{ marginTop: 6 }} placeholder="databaseURL  (https://xyz-default-rtdb.firebaseio.com)" value={fb.databaseURL}
+                  onChange={(e) => setFb({ ...fb, databaseURL: e.target.value })} />
+                <input className="text-input" style={{ marginTop: 6 }} placeholder="projectId" value={fb.projectId}
+                  onChange={(e) => setFb({ ...fb, projectId: e.target.value })} />
+                <input className="text-input" style={{ marginTop: 6 }} placeholder="appId" value={fb.appId}
+                  onChange={(e) => setFb({ ...fb, appId: e.target.value })} />
+                <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                  <button className="btn btn-primary" onClick={saveLiveSync}>Save &amp; reload</button>
+                </div>
+                {fbErr && <p style={{ color: '#f5b148', fontSize: 11.5, marginTop: 8 }}>{fbErr}</p>}
+              </>
+            )}
+            {fbOn && (
+              <button className="btn" onClick={clearLiveSync}><i className="fa-solid fa-trash" /> Remove config</button>
+            )}
           </div>
 
           {/* ---------- live status ---------- */}

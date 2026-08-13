@@ -12,7 +12,7 @@
  * All writes are best-effort; the UI stays instant and optimistic.
  */
 
-import { CONFIG, storage } from './config.js';
+import { CONFIG, storage, resolveFirebaseConfig } from './config.js';
 
 const BC_NAME = 'ishq-social-v1';
 const LOCAL_KEY = 'ishq.social.v1';
@@ -43,7 +43,7 @@ class SocialEngine {
 
   init() {
     this.teardown();
-    if (CONFIG.firebase.enabled) this.connectFirebase();
+    if (resolveFirebaseConfig()) this.connectFirebase();
     this.connectBroadcast(); // always keep tab-level sync
     this.emit('activity', {
       id: this.tabId + '-here',
@@ -56,7 +56,7 @@ class SocialEngine {
     try {
       const { initializeApp, getApps, getApp } = await import('firebase/app');
       const { getDatabase, ref, push, onChildAdded, onDisconnect } = await import('firebase/database');
-      const app = getApps().length ? getApp() : initializeApp(CONFIG.firebase.config);
+      const app = getApps().length ? getApp() : initializeApp(resolveFirebaseConfig());
       const db = getDatabase(app);
       const { paths } = CONFIG.firebase;
       if (!paths.reactions || !paths.dedications) throw new Error('social paths not configured');
