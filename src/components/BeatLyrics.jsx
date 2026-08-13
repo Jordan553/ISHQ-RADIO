@@ -21,7 +21,7 @@ const QUOTES = [
   'Two people. One song. Zero words needed.'
 ];
 
-export default function BeatLyrics({ nudger = false }) {
+export default function BeatLyrics({ nudger = false, showMeta = true }) {
   const playlist = useStore((s) => s.playlist);
   const live = useStore((s) => s.live);
   const onlineNow = useStore((s) => s.onlineNow);
@@ -62,10 +62,12 @@ export default function BeatLyrics({ nudger = false }) {
 
   return (
     <div className="beat-lyrics" aria-hidden="true">
-      <div className="bl-meta">
-        <span className="bl-live"><span className="dot" /> LIVE</span>
-        {track.title} — {track.artist}
-      </div>
+      {showMeta && (
+        <div className="bl-meta">
+          <span className="bl-live"><span className="dot" /> LIVE</span>
+          {track.title} — {track.artist}
+        </div>
+      )}
       {lines.length ? (
         <div className="bl-lines">
           <div className="bl-line prev">{lines[Math.max(0, li - 1)]?.text || '\u00A0'}</div>

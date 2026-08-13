@@ -545,6 +545,16 @@ body.vibe-fs .yt-frame {
   transform: scale(1.06);
   transition: opacity 1.2s var(--ease), filter 1.2s var(--ease);
 }
+/* lyrics over the vibe video — bigger, glowy, readable */
+#vibe-fs .beat-lyrics { z-index: 2; }
+#vibe-fs .bl-line.now { font-size: clamp(40px, 6vw, 66px); }
+#vibe-fs .bl-line {
+  text-shadow: 0 3px 24px rgba(0, 0, 0, 0.95), 0 0 46px rgba(255, 42, 75, 0.5);
+}
+#vibe-fs .bl-line.prev, #vibe-fs .bl-line.next {
+  font-size: clamp(18px, 2.4vw, 27px);
+  color: rgba(255, 255, 255, 0.35);
+}
 body.vibe-fs #app {
   opacity: 0;
   pointer-events: none;
