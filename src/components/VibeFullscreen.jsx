@@ -24,6 +24,7 @@ export default function VibeFullscreen() {
   const duration = useStore((s) => s.duration);
   const backToLive = useStore((s) => s.backToLive);
   const inLive = useStore((s) => s.inLive);
+  const vibeFsVideo = useStore((s) => s.vibeFsVideo);
 
   useEffect(() => {
     document.body.classList.toggle('vibe-fs', open);
@@ -64,6 +65,7 @@ export default function VibeFullscreen() {
       <div className="vibe-fs-top">
         <span className="live-chip"><span className="dot" /> LIVE</span>
         <span className="vibe-fs-title">{track.title} — {track.artist}</span>
+        {vibeFsVideo && <span className="vibe-fs-note">visuals · audio from Drive</span>}
       </div>
 
       <div className="vibe-fs-bar">

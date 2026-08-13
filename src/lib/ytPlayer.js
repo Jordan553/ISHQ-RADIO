@@ -126,6 +126,10 @@ class YtPlayer {
   stop() {
     if (this.ready) this.player.stopVideo?.();
   }
+  /** Mute — used for visuals-only playback (local MP3 keeps the audio). */
+  mute() {
+    if (this.ready) this.player.mute?.();
+  }
 
   time() {
     return this.ready ? this.player.getCurrentTime?.() || 0 : 0;
@@ -141,7 +145,10 @@ class YtPlayer {
     return this.state() === YT_STATE.PLAYING || this.state() === YT_STATE.BUFFERING;
   }
   setVolume(v) {
-    if (this.ready) this.player.setVolume?.(Math.round(Math.min(1, Math.max(0, v)) * 100));
+    if (this.ready) {
+      this.player.unMute?.();
+      this.player.setVolume?.(Math.round(Math.min(1, Math.max(0, v)) * 100));
+    }
   }
 }
 

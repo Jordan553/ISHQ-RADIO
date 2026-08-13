@@ -61,6 +61,8 @@ export const useStore = create((set, get) => ({
   isAdmin: storage.get('ishq.admin', false),
   vibe: storage.get('ishq.vibe', false),
   vibeFsOpen: false,
+  vibeFsVideo: null, // visuals-only videoId while in fullscreen over a local song
+  videoFor: storage.get('ishq.videoFor', {}),
   theaterOpen: false,
   party: false,
   settingsOpen: false,
@@ -337,15 +339,53 @@ export const useStore = create((set, get) => ({
     pushToast(next ? 'Vibe on — the song is the room now' : 'Vibe off — back to the lounge', next ? 'live' : 'info');
   },
 
-  /** Fullscreen vibe — the video of the online song fills the screen. */
-  openVibeFs() {
-    if (!get().onlineNow) {
-      pushToast('Vibe fullscreen needs an online song — the video plays in sync', 'warn');
+  /** Fullscreen vibe — the video of the current song fills the screen. */
+  async openVibeFs() {
+    const s = get();
+    if (s.onlineNow) { set({ vibeFsOpen: true }); return; }
+
+    // local song — play its video MUTED as visuals while the MP3 keeps the audio
+    const track = s.playlist[s.live?.currentSongIndex] || s.playlist[0];
+    if (!track) { pushToast('Nothing playing yet', 'warn'); return; }
+    if (!s.ytReady) {
+      pushToast('YouTube engine still warming up — try again in a few seconds', 'warn');
       return;
     }
-    set({ vibeFsOpen: true });
+    const start = (vid) => {
+      if (!vid) { pushToast('No video found for this song', 'warn'); return; }
+      ytPlayer.loadVideo(vid, Math.floor(s.currentTime || 0));
+      ytPlayer.mute();
+      if (s.audioPlaying) ytPlayer.play();
+      set({ vibeFsVideo: vid, vibeFsOpen: true });
+    };
+    const cached = s.videoFor?.[track.id] || track.videoId;
+    if (cached) { start(cached); return; }
+    // find & cache a video for this track (title + artist search)
+    try {
+      const res = await fetch(`/search-online?q=${encodeURIComponent(`${track.title} ${track.artist || ''}`.trim())}`);
+      const { results } = await res.json().catch(() => ({}));
+      const vid = results?.[0]?.videoId || null;
+      if (vid) {
+        const videoFor = { ...get().videoFor, [track.id]: vid };
+        storage.set('ishq.videoFor', videoFor);
+        set({ videoFor });
+      }
+      if (get().vibeFsOpen) return; // closed while searching
+      start(vid);
+    } catch {
+      start(null);
+    }
   },
-  closeVibeFs() { set({ vibeFsOpen: false }); },
+
+  closeVibeFs() {
+    const s = get();
+    if (s.vibeFsVideo) {
+      ytPlayer.stop();
+      ytPlayer.setVolume(s.volume); // restore — also un-mutes
+      set({ vibeFsVideo: null });
+    }
+    set({ vibeFsOpen: false });
+  },
 
   /**
    * Drive sync — the app's whole music library comes from your Drive
