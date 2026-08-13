@@ -113,8 +113,8 @@
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  gap: 18px;
-  padding: 34px 30px 26px;
+  gap: 14px;
+  padding: 22px 26px 18px;
   flex: 1;
   justify-content: center;
   min-height: 0;
@@ -122,7 +122,7 @@
 .now-playing::before, .now-playing::after { background: transparent; }
 .main, .page, .stage { background: transparent; }
 /* hero art scales with screen height so the card fills the stage like the side panels */
-.art-wrap { width: min(33vh, 52vw); margin: 6px 0; flex-shrink: 0; }
+.art-wrap { width: clamp(180px, 30vh, 330px); margin: 4px 0; flex: 0 0 auto; }
 .art-glow { display: none; }
 .vinyl-disc { display: none; }
 .artwork {
@@ -338,6 +338,16 @@ body.midnight .rail .vibe-widget { background: rgba(255, 255, 255, 0.02); }
 
 /* ---------- theater: calm ---------- */
 .theater-bar-controls .btn-live { background: linear-gradient(140deg, #ff4d68, #e0203f); box-shadow: none; animation: none; }
+
+/* ---------- seasoning ---------- */
+@media (max-height: 900px) {
+  .now-playing { gap: 12px; padding: 18px 22px 14px; }
+  .art-wrap { width: clamp(160px, 26vh, 280px); }
+  .room-note { display: none; }
+  .stage-lyric-holder { min-height: 34px; }
+  .player-extras { gap: 14px; }
+  .rail .rail-tabs-card { height: min(58vh, 560px); }
+}
 
 /* ---------- seasoning ---------- */
 .song-dedication { background: rgba(255, 59, 87, 0.07); }

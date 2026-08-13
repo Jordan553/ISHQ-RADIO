@@ -131,9 +131,8 @@ img { display: block; max-width: 100%; }
   grid-template-areas: "topbar topbar" "sidebar main";
   grid-template-columns: var(--sidebar-w) 1fr;
   grid-template-rows: var(--topbar-h) 1fr;
-  min-height: 100vh;
-  opacity: 0;
-  transition: opacity 0.7s var(--ease);
+  height: 100vh;
+  overflow: hidden;
 }
 #app.ready { opacity: 1; }
 
@@ -475,6 +474,8 @@ img { display: block; max-width: 100%; }
   gap: 22px;
   padding: 24px 26px;
   min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 .stage { display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; min-height: 0; }
 /* hero content keeps a readable measure on ultra-wide screens */
