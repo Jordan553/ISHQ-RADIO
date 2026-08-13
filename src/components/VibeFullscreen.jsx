@@ -75,7 +75,7 @@ export default function VibeFullscreen() {
         {vibeFsVideo && <span className="vibe-fs-note">visuals · audio from Drive</span>}
       </div>
 
-      <BeatLyrics showMeta={false} />
+      <BeatLyrics showMeta={false} showQuote={false} />
 
       <div className="vibe-fs-bar">
         <div className="vibe-fs-progress"><PlayerProgress /></div>

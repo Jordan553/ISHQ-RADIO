@@ -21,7 +21,7 @@ const QUOTES = [
   'Two people. One song. Zero words needed.'
 ];
 
-export default function BeatLyrics({ nudger = false, showMeta = true }) {
+export default function BeatLyrics({ nudger = false, showMeta = true, showQuote = true }) {
   const playlist = useStore((s) => s.playlist);
   const live = useStore((s) => s.live);
   const onlineNow = useStore((s) => s.onlineNow);
@@ -87,9 +87,9 @@ export default function BeatLyrics({ nudger = false, showMeta = true }) {
           <i className="fa-solid fa-music" />
           <span>finding lyrics…</span>
         </div>
-      ) : (
+      ) : showQuote ? (
         <div className="bl-quote" key={track.id || 'q'}>&ldquo;{quote}&rdquo;</div>
-      )}
+      ) : null}
 
       {nudger && lines.length > 0 && (
         <div className="bl-nudge" onClick={(e) => e.stopPropagation()}>
