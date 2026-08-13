@@ -24,7 +24,7 @@
 
 /* ---------- artwork + vinyl ---------- */
 /* rock-solid square — same size for every song, no per-track jumping */
-.art-wrap { position: relative; width: min(280px, 60vw); aspect-ratio: 1; margin: 4px 0; }
+.art-wrap { position: relative; width: min(292px, 56vw); aspect-ratio: 1; margin: 4px 0; }
 .art-glow {
   position: absolute; inset: -14%;
   border-radius: 50%;

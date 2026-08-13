@@ -476,9 +476,9 @@ img { display: block; max-width: 100%; }
   padding: 24px 26px;
   min-height: 0;
 }
-.stage { display: flex; flex-direction: column; gap: 16px; min-width: 0; min-height: 0; }
+.stage { display: flex; flex-direction: column; justify-content: center; gap: 16px; min-width: 0; min-height: 0; }
 /* hero content keeps a readable measure on ultra-wide screens */
-.stage > * { width: 100%; max-width: 660px; margin-inline: auto; }
+.stage > * { width: 100%; max-width: min(90vh, 820px); margin-inline: auto; }
 
 /* ---------- right rail ---------- */
 .rail {
@@ -595,7 +595,7 @@ img { display: block; max-width: 100%; }
 
 /* ---------- stage karaoke line ---------- */
 .stage-lyric-holder {
-  min-height: 30px;
+  min-height: 44px;
   display: flex; align-items: flex-end; justify-content: center;
   padding: 0 8px;
 }
@@ -608,11 +608,13 @@ img { display: block; max-width: 100%; }
   max-width: 100%;
   text-align: center;
   font-family: var(--font-lrc, var(--font-ui));
-  font-size: clamp(14px, 1.5vw, 18px);
+  font-size: clamp(17px, 2.1vw, 24px);
   font-style: italic;
+  font-weight: 600;
   line-height: 1.45;
-  color: #f2c8d4;
-  letter-spacing: 0.2px;
+  color: #ffdde6;
+  letter-spacing: 0.3px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8), 0 0 34px rgba(255, 90, 110, 0.45);
   transition: opacity 0.26s ease, transform 0.26s ease;
 }
 .sl-text.out { opacity: 0; transform: translateY(8px); }
@@ -1115,14 +1117,14 @@ body.cinema .time-lbl { text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8); }
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85), 0 0 30px rgba(255, 90, 110, 0.25);
 }
 .bl-line.prev, .bl-line.next {
-  font-size: clamp(15px, 1.9vw, 21px);
+  font-size: clamp(17px, 2.1vw, 24px);
   color: rgba(255, 255, 255, 0.3);
 }
 .bl-line.now {
-  font-size: clamp(26px, 4vw, 44px);
+  font-size: clamp(30px, 4.6vw, 52px);
   font-weight: 800;
   color: #fff;
-  text-shadow: 0 0 38px rgba(255, 90, 110, 0.75), 0 2px 20px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 0 44px rgba(255, 90, 110, 0.85), 0 0 90px rgba(255, 42, 75, 0.35), 0 2px 22px rgba(0, 0, 0, 0.9);
   animation: bl-pop 0.32s var(--ease);
 }
 @keyframes bl-pop {

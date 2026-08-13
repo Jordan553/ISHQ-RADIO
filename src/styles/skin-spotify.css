@@ -379,8 +379,8 @@ body.party .grain { opacity: 0.03; }
 }
 .q-refresh:hover { color: #fff; background: #2a2a31; transform: rotate(180deg); }
 
-/* rail cards: the queue owns the tall space, decorations follow below */
-.rail .rail-tabs-card { max-height: 62vh; min-height: 300px; }
+/* rail cards: fixed height so switching tabs never resizes the box */
+.rail .rail-tabs-card { height: min(60vh, 620px); min-height: 340px; }
 .rail .queue-list { padding: 10px; }
 .rail::-webkit-scrollbar { width: 6px; }
 .rail::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 999px; }
