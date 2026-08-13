@@ -70,26 +70,57 @@ async function invidiousFetch(path, timeoutMs = 12000) {
 const searchCache = new Map();   // query -> { at, results }
 const searchTTL = 5 * 60 * 1000;
 
-/** Search YouTube, returning lightweight results without downloading. */
+/** Search YouTube via Piped (primary) then Invidious (fallback). */
 async function searchYt(q, limit = 6) {
   const qk = String(q).trim();
   const hit = searchCache.get(qk);
   if (hit && Date.now() - hit.at < searchTTL) return hit.results;
-  const out = await invidiousFetch(
-    `/api/v1/search?q=${encodeURIComponent(qk.slice(0, 120))}&type=video`
-  );
-  if (!out) throw new Error('YouTube search unavailable');
-  const entries = Array.isArray(out.json) ? out.json : [];
-  const results = entries
-    .filter((e) => e && e.videoId && e.title)
-    .slice(0, limit)
-    .map((e) => ({
-      videoId: e.videoId,
-      title: e.title,
-      channel: e.author || 'YouTube',
-      duration: e.lengthSeconds || 0,
-      thumb: `https://i.ytimg.com/vi/${e.videoId}/mqdefault.jpg`
-    }));
+  const clean = encodeURIComponent(qk.slice(0, 120));
+  let results = null;
+
+  for (const base of pipedBases()) {
+    try {
+      const res = await fetch(`${base}/search?q=${clean}&filter=videos`, {
+        headers: { Accept: 'application/json' },
+        signal: AbortSignal.timeout(9000)
+      });
+      if (!res.ok) continue;
+      if (!(res.headers.get('content-type') || '').includes('application/json')) continue;
+      const j = await res.json();
+      const items = (j.items || []).map((e) => ({
+        ...e,
+        videoId: e.videoId || String(e.url || '').replace('/watch?v=', '')
+      })).filter((e) => e && e.videoId && e.title);
+      if (!items.length) continue;
+      pipedOk = base;
+      results = items.slice(0, limit).map((e) => ({
+        videoId: e.videoId,
+        title: e.title,
+        channel: e.uploaderName || 'YouTube',
+        duration: Number(e.duration) || 0,
+        thumb: `https://i.ytimg.com/vi/${e.videoId}/mqdefault.jpg`
+      }));
+      break;
+    } catch { /* next */ }
+  }
+
+  if (!results) {
+    const out = await invidiousFetch(`/api/v1/search?q=${clean}&type=video`);
+    if (out && Array.isArray(out.json)) {
+      results = out.json
+        .filter((e) => e && e.videoId && e.title)
+        .slice(0, limit)
+        .map((e) => ({
+          videoId: e.videoId,
+          title: e.title,
+          channel: e.author || 'YouTube',
+          duration: e.lengthSeconds || 0,
+          thumb: `https://i.ytimg.com/vi/${e.videoId}/mqdefault.jpg`
+        }));
+    }
+  }
+
+  if (!results) throw new Error('YouTube search unavailable');
   searchCache.set(qk, { at: Date.now(), results });
   return results;
 }
@@ -97,25 +128,126 @@ async function searchYt(q, limit = 6) {
 const urlCache = new Map();      // videoId -> { url, at }
 const RESOLVE_TTL_MS = 10 * 60 * 1000;
 
+/** Piped API instances — keyless search + stream resolution fallback. */
+const PIPED = [
+  'https://api.piped.private.coffee',
+  'https://pipedapi.adminforge.de',
+  'https://api.piped.yt',
+  'https://pipedapi.ducks.party'
+];
+let pipedOk = null; // sticky last-working piped instance
+
+function pipedBases() {
+  return pipedOk
+    ? [pipedOk, ...PIPED.filter((b) => b !== pipedOk)]
+    : [...PIPED];
+}
+
+/* ----------------------------------------------------------------
+   Innertube player API — resolves a direct audio URL WITHOUT any
+   external binary. The ANDROID_VR client + a visitorData cookie
+   bypasses YouTube's "confirm you're not a bot" gate for datacenter
+   IPs. Pure fetch → runs on Node, Vite, and Cloudflare Functions.
+   Fallback chain: ANDROID_VR → ANDROID → Piped → Invidious.
+   ---------------------------------------------------------------- */
+const INNERTUBE = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false';
+const YT_PLAYER_UA = 'com.google.android.youtube/19.12.37 (Linux; U; Android 10; en_US)';
+const YT_VISITOR_UA = 'Mozilla/5.0 (Linux; Android 10) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Mobile Safari/537.36';
+let visitorData = null;
+let visitorAt = 0;
+const VISITOR_TTL_MS = 60 * 60 * 1000;
+
+async function getVisitorData() {
+  if (visitorData && Date.now() - visitorAt < VISITOR_TTL_MS) return visitorData;
+  try {
+    const res = await fetch('https://www.youtube.com/', {
+      headers: { 'User-Agent': YT_VISITOR_UA, 'Accept-Language': 'en' },
+      signal: AbortSignal.timeout(10000)
+    });
+    const html = await res.text();
+    const m = html.match(/"visitorData":"([^"]+)"/);
+    if (m?.[1]) {
+      visitorData = m[1];
+      visitorAt = Date.now();
+      return visitorData;
+    }
+  } catch { /* retry next call */ }
+  return visitorData || null;
+}
+
+async function innertubeAudio(videoId, clientName, clientVersion, sdk) {
+  const vd = await getVisitorData();
+  const body = {
+    context: {
+      client: {
+        clientName,
+        clientVersion,
+        androidSdkVersion: sdk,
+        hl: 'en',
+        gl: 'US',
+        ...(vd ? { visitorData: vd } : {})
+      }
+    },
+    videoId
+  };
+  const res = await fetch(INNERTUBE, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': YT_PLAYER_UA,
+      'Accept-Encoding': 'identity'
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15000)
+  });
+  if (!res.ok) return null;
+  const j = await res.json();
+  if (j.playabilityStatus?.status !== 'OK') return null;
+  const fmts = j.streamingData?.adaptiveFormats || [];
+  const audio = fmts
+    .filter((f) => f && f.url && String(f.mimeType || '').startsWith('audio/'))
+    .sort((a, b) => {
+      const score = (f) => (f.bitrate || 0) + (f.itag === 140 ? 1_000_000 : f.itag === 139 ? 500_000 : 0);
+      return score(b) - score(a);
+    });
+  return audio[0]?.url || null;
+}
+
 /** Resolve a video id to a direct audio URL (cached 10 min). */
 async function resolveStreamUrl(videoId) {
   const hit = urlCache.get(videoId);
   if (hit && Date.now() - hit.at < RESOLVE_TTL_MS) return hit.url;
-  const out = await invidiousFetch(
-    `/api/v1/videos/${encodeURIComponent(videoId)}?pretty=0`,
-    15000
-  );
-  if (!out) throw new Error('video resolve unavailable');
-  const j = out.json;
-  const fmts = j.adaptiveFormats || j.formatStreams || [];
-  const audio =
-    fmts
-      .filter((f) => f && f.url && !String(f.type || '').startsWith('video'))
-      .sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))[0] ||
-    fmts.find((f) => f && f.url);
-  if (!audio?.url) throw new Error('no audio url resolved');
-  urlCache.set(videoId, { url: audio.url, at: Date.now() });
-  return audio.url;
+
+  let url = null;
+  const picks = [];
+  for (const c of [{ n: 'ANDROID_VR', v: '1.61.21', s: 30 }, { n: 'ANDROID', v: '19.12.37', s: 30 }]) {
+    const u = await innertubeAudio(videoId, c.n, c.v, c.s);
+    if (u) picks.push(u);
+  }
+  url = picks.find((u) => /mime=audio%2Fmp4|mime=audio\/mp4|itag=140|itag=139/.test(u))
+    || picks[0];
+
+  if (!url) {
+    /* Piped instances — some resolve fine from clean IPs. */
+    for (const base of pipedBases()) {
+      try {
+        const res = await fetch(`${base}/streams/${encodeURIComponent(videoId)}`, {
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(9000)
+        });
+        if (!res.ok) continue;
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) continue;
+        const j = await res.json();
+        const audio = (j.audioStreams || []).find((f) => f && f.url);
+        if (audio?.url) { pipedOk = base; url = audio.url; break; }
+      } catch { /* next */ }
+    }
+  }
+
+  if (!url) throw new Error('no audio url resolved');
+  urlCache.set(videoId, { url, at: Date.now() });
+  return url;
 }
 
 /** iTunes artwork + clean title fallback (no API key needed). */
