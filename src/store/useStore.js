@@ -356,7 +356,7 @@ export const useStore = create((set, get) => ({
 
   closeVibeFs() {
     const s = get();
-    if (s.vibeFsVideo) {
+    if (s.vibeFsVideo || ytPlayer.isMuted()) {
       ytPlayer.stop();
       ytPlayer.setVolume(s.volume); // restore — also un-mutes
       set({ vibeFsVideo: null });
@@ -376,6 +376,13 @@ export const useStore = create((set, get) => ({
     if (s.onlineNow) { set({ vibeFsVideo: null }); return; }
     const track = s.playlist[s.live?.currentSongIndex] || s.playlist[0];
     if (!track) return;
+    // If this track's audio ALREADY flows from its own video in the yt
+    // player (enriched Drive pick), it is the visuals — muting or
+    // reloading it here would kill the sound.
+    if (track.videoId && ytPlayer.currentVideoId === track.videoId && s.ytFailedVideoId !== track.videoId) {
+      set({ vibeFsVideo: null });
+      return;
+    }
     const start = (vid) => {
       if (!vid) {
         const st = get();

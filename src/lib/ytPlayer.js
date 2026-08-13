@@ -134,6 +134,9 @@ class YtPlayer {
     this._muted = true;
     if (this.ready) this.player.mute?.();
   }
+  isMuted() {
+    return !!this._muted;
+  }
 
   time() {
     return this.ready ? this.player.getCurrentTime?.() || 0 : 0;

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useStore } from '../store/useStore.js';
 import PlayerProgress from './PlayerProgress.jsx';
-import BeatLyrics from './BeatLyrics.jsx';
 import { fmtTime } from '../lib/lrcParser.js';
 
 /**
@@ -74,8 +73,6 @@ export default function VibeFullscreen() {
         <span className="vibe-fs-title">{track.title} — {track.artist}</span>
         {vibeFsVideo && <span className="vibe-fs-note">visuals · audio from Drive</span>}
       </div>
-
-      <BeatLyrics showMeta={false} showQuote={false} />
 
       <div className="vibe-fs-bar">
         <div className="vibe-fs-progress"><PlayerProgress /></div>
