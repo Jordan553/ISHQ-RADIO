@@ -4,7 +4,6 @@ import { audioEngine } from './lib/audioEngine.js';
 import TopBar from './components/TopBar.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import NowPlaying from './components/NowPlaying.jsx';
-import LyricsPanel from './components/LyricsPanel.jsx';
 import QueuePanel from './components/QueuePanel.jsx';
 import YouTubeFrame from './components/YouTubeFrame.jsx';
 import { ytPlayer } from './lib/ytPlayer.js';
@@ -116,10 +115,10 @@ export default function App() {
             <div className="rail-card rail-tabs-card">
               <div className="rail-tabs">
                 <button
-                  className={`rail-tab ${railTab === 'lyrics' ? 'active' : ''}`}
-                  onClick={() => useStore.setState({ railTab: 'lyrics' })}
+                  className={`rail-tab ${railTab === 'loveletter' ? 'active' : ''}`}
+                  onClick={() => useStore.setState({ railTab: 'loveletter' })}
                 >
-                  <i className="fa-solid fa-scroll" style={{ marginRight: 6 }} /> Lyrics
+                  <i className="fa-solid fa-pen-nib" style={{ marginRight: 6 }} /> Love Letter
                 </button>
                 <button
                   className={`rail-tab ${railTab === 'queue' ? 'active' : ''}`}
@@ -129,7 +128,7 @@ export default function App() {
                 </button>
               </div>
               <div className="rail-panel">
-                {railTab === 'lyrics' ? <LyricsPanel /> : <QueuePanel />}
+                {railTab === 'loveletter' ? <LoveLetter bare /> : <QueuePanel />}
               </div>
             </div>
 
@@ -151,7 +150,6 @@ export default function App() {
 
               <VibeWidget />
               <LiveMoments />
-              <LoveLetter />
             </div>
           </aside>
         </main>

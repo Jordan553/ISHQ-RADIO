@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useStore } from '../store/useStore.js';
-import { useBeat } from '../hooks/useBeat.js';
-import { fetchLrc } from '../lib/lyrics.js';
+import { useLrc } from '../hooks/useLrc.js';
+import { activeLineIndex } from '../lib/lrcParser.js';
 
 /**
- * Theater beat lyrics — big centered lines floating over the scene.
- * Every musical beat advances the active line (karaoke on the pulse).
+ * Theater lyrics — big centered lines floating over the cinema scene.
+ * The active line follows the song clock (same sync as the stage line
+ * and the rail), with the previous/next lines softly flanking it.
  * Falls back to a love quote when the track has no lyrics.
  */
 const QUOTES = [
@@ -22,60 +23,36 @@ export default function BeatLyrics() {
   const playlist = useStore((s) => s.playlist);
   const live = useStore((s) => s.live);
   const onlineNow = useStore((s) => s.onlineNow);
-  const tracksMeta = useStore((s) => s.tracksMeta);
-  const track = onlineNow || playlist[live?.currentSongIndex] || playlist[0];
+  const currentTime = useStore((s) => s.currentTime);
 
-  const [lines, setLines] = useState([]);
-  const [li, setLi] = useState(0);
+  const track = onlineNow || playlist[live?.currentSongIndex] || playlist[0];
+  const meta = useLrc(track);
+
+  const lines = meta?.lrc?.lines || [];
+  const synced = meta?.lrc?.meta?.synced !== false;
+  const idx = synced && lines.length ? activeLineIndex(lines, currentTime, 0) : -1;
+
   const quoteRef = useRef(0);
   if (!quoteRef.current) quoteRef.current = 1 + Math.floor(Math.random() * QUOTES.length);
 
-  const { beat } = useBeat();
-
-  // resolve lyrics for the current track (lazy LRCLIB fetch, same as LyricsView)
-  useEffect(() => {
-    if (!track) return;
-    const rec = useStore.getState().tracksMeta[track.id];
-    if (rec?.lrc) { setLines(rec.lrc.lines || []); return; }
-    if (rec?.status === 'loading' || rec?.status === 'missing' || rec?.status === 'error') return;
-    useStore.setState((s) => ({ tracksMeta: { ...s.tracksMeta, [track.id]: { ...s.tracksMeta[track.id], status: 'loading' } } }));
-    fetchLrc(track).then(({ lrc }) => {
-      setLines(lrc?.lines || []);
-      useStore.setState((s) => ({
-        tracksMeta: {
-          ...s.tracksMeta,
-          [track.id]: { lrc: lrc || s.tracksMeta[track.id]?.lrc || null, status: lrc ? 'ok' : 'missing' }
-        }
-      }));
-    });
-  }, [track]);
-
-  // restart from the top when the track changes
-  useEffect(() => { setLi(0); }, [track?.id]);
-
-  // one line per beat — the lyrics ride the rhythm
-  useEffect(() => {
-    if (!lines.length || !beat) return;
-    setLi((i) => Math.min(i + 1, lines.length - 1));
-  }, [beat, lines.length]);
-
   if (!track) return null;
   const quote = QUOTES[(quoteRef.current - 1) % QUOTES.length];
+  const li = idx >= 0 ? idx : 0;
 
   return (
     <div className="beat-lyrics" aria-hidden="true">
       <div className="bl-meta">
-        <span className="bl-live"><span className="dot" /> BEAT</span>
+        <span className="bl-live"><span className="dot" /> LIVE</span>
         {track.title} — {track.artist}
       </div>
       {lines.length ? (
         <div className="bl-lines">
           <div className="bl-line prev">{lines[Math.max(0, li - 1)]?.text || '\u00A0'}</div>
-          <div className="bl-line now" key={li}>{lines[li]?.text || '\u00A0'}</div>
+          <div className="bl-line now" key={`${track.id}-${li}`}>{lines[li]?.text || '\u00A0'}</div>
           <div className="bl-line next">{lines[Math.min(lines.length - 1, li + 1)]?.text || '\u00A0'}</div>
         </div>
       ) : (
-        <div className="bl-quote" key={quoteRef.current}>&ldquo;{quote}&rdquo;</div>
+        <div className="bl-quote" key={track.id || 'q'}>&ldquo;{quote}&rdquo;</div>
       )}
     </div>
   );

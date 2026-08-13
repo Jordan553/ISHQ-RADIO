@@ -28,6 +28,21 @@ export default function FullscreenLyrics() {
 
   useEffect(() => {
     if (!open) return;
+    // real browser fullscreen — the theater owns the whole screen
+    const req = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+    req?.call(document.documentElement).catch?.();
+    const onFsChange = () => {
+      if (!document.fullscreenElement) closeTheater();
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange);
+      if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    };
+  }, [open, closeTheater]);
+
+  useEffect(() => {
+    if (!open) return;
     const onKey = (e) => {
       if (e.key === 'Escape') closeTheater();
       if (e.key === ' ') { e.preventDefault(); toggleLocalPlay(); }

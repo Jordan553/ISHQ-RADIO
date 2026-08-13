@@ -61,7 +61,7 @@ export const useStore = create((set, get) => ({
   theaterOpen: false,
   party: false,
   settingsOpen: false,
-  railTab: 'lyrics',
+  railTab: 'queue',
   drawerOpen: false,
   toasts: [],
   autoScroll: true,

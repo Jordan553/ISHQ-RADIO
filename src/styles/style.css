@@ -1462,6 +1462,12 @@ body.midnight .mood-aura { opacity: 0.55; }
    Love Letter generator card
    ============================================================ */
 .love-letter { flex: 0 0 auto; padding: 14px 16px 16px; overflow: visible; }
+.love-letter.in-panel {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 8px 4px 4px;
+  background: none; border: none; box-shadow: none;
+}
 .ll-write {
   width: 100%;
   padding: 12px 14px;

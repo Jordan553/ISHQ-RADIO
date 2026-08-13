@@ -6,7 +6,7 @@ import { loveLetter, SHARE_INTENTS } from '../lib/loveLetters.js';
  * Love Letter Generator — a romantic one-liner drawn for the current
  * mood, with copy + WhatsApp/Telegram/X share buttons.
  */
-export default function LoveLetter() {
+export default function LoveLetter({ bare = false }) {
   const mood = useStore((s) => s.mood);
   const pushToast = useStore((s) => s.pushToast);
   const [line, setLine] = useState(null);
@@ -29,7 +29,7 @@ export default function LoveLetter() {
   };
 
   return (
-    <div className="rail-card love-letter">
+    <div className={bare ? 'love-letter in-panel' : 'rail-card love-letter'}>
       <div className="lc-head">
         <span><i className="fa-solid fa-pen-nib" style={{ color: 'var(--red-soft)', marginRight: 6 }} /> LOVE LETTER</span>
         <span className="lm-hint">one line, from my heart</span>
