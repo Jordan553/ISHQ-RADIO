@@ -113,12 +113,16 @@
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
-  gap: 16px;
-  padding: 30px 28px 24px;
+  gap: 18px;
+  padding: 34px 30px 26px;
+  flex: 1;
+  justify-content: center;
+  min-height: 0;
 }
 .now-playing::before, .now-playing::after { background: transparent; }
 .main, .page, .stage { background: transparent; }
-.art-wrap { width: min(280px, 60vw); margin: 4px 0; }
+/* hero art scales with screen height so the card fills the stage like the side panels */
+.art-wrap { width: min(33vh, 52vw); margin: 6px 0; flex-shrink: 0; }
 .art-glow { display: none; }
 .vinyl-disc { display: none; }
 .artwork {
