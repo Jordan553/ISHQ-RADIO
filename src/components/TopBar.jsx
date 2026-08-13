@@ -19,6 +19,8 @@ export default function TopBar() {
   const liveIndex = useStore((s) => s.live?.currentSongIndex ?? 0);
   const party = useStore((s) => s.party);
   const toggleParty = useStore((s) => s.toggleParty);
+  const vibe = useStore((s) => s.vibe);
+  const toggleVibe = useStore((s) => s.toggleVibe);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -179,6 +181,17 @@ export default function TopBar() {
 
         <button className="icon-btn theater-top-btn" aria-label="Theater mode" title="Theater mode — cinema scene with beat lyrics" onClick={openTheater}>
           <i className="fa-solid fa-expand" />
+        </button>
+
+        <button
+          className={`vibe-pill${vibe ? ' on' : ''}`}
+          aria-label="Vibe mode"
+          aria-pressed={vibe}
+          title="Vibe mode — the song's video plays blurred behind everything"
+          onClick={toggleVibe}
+        >
+          <i className="fa-solid fa-circle-half-stroke" />
+          <span>Vibe</span>
         </button>
 
         <button

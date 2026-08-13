@@ -59,6 +59,7 @@ export const useStore = create((set, get) => ({
   isRepeat: storage.get('ishq.repeat', false),
   customMoods: storage.get('ishq.customMoods', []),
   isAdmin: storage.get('ishq.admin', false),
+  vibe: storage.get('ishq.vibe', false),
   theaterOpen: false,
   party: false,
   settingsOpen: false,
@@ -326,6 +327,14 @@ export const useStore = create((set, get) => ({
   },
 
   toggleParty() { set({ party: !get().party }); },
+
+  /** Immersive vibe — the online song's video plays blurred behind the app. */
+  toggleVibe() {
+    const next = !get().vibe;
+    storage.set('ishq.vibe', next);
+    set({ vibe: next });
+    pushToast(next ? 'Vibe on — the song is the room now' : 'Vibe off — back to the lounge', next ? 'live' : 'info');
+  },
 
   /**
    * Drive sync — the app's whole music library comes from your Drive
