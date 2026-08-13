@@ -209,6 +209,15 @@ export const useStore = create((set, get) => ({
     if (online && online.videoId === vid && online.audioUrl) {
       playTrack(online, 0, true);
       pushToast('YouTube embed blocked this video — streamed via relay instead', 'warn');
+    } else if (s.inLive) {
+      // the live room's video got blocked — keep the radio audible via the MP3 relay
+      const t = s.playlist[s.live?.currentSongIndex ?? 0];
+      if (t?.audioUrl) {
+        playTrack(t, syncEngine.positionAt(), true);
+        pushToast('YouTube embed blocked this video — live radio continues via relay', 'warn');
+      } else {
+        pushToast(`YouTube couldn't play this video (${code})`, 'warn');
+      }
     } else {
       pushToast(`YouTube couldn't play this video (${code})`, 'warn');
     }
@@ -862,6 +871,9 @@ function startYtClock() {
   ytClockTimer = setInterval(() => {
     const s = useStore.getState();
     if (!s.ytReady || !ytPlayer.currentVideoId) return;
+    // the video errored and the audio relay took over — the dead player's
+    // clock would clobber the real one (lyrics would freeze). Skip it.
+    if (s.ytFailedVideoId === ytPlayer.currentVideoId) return;
     const t = ytPlayer.time();
     const d = ytPlayer.duration();
     if (Math.abs(t - s.currentTime) > 0.03) useStore.setState({ currentTime: t });
