@@ -50,7 +50,7 @@ export default function SettingsModal() {
         <div className="modal-body">
           {/* ---------- sound ---------- */}
           <div className="setting-group">
-            <h3>Sound</h3>
+            <h3><i className="fa-solid fa-volume-high" /> Sound</h3>
             <div className="setting-row">
               <span className="row-label">Volume</span>
               <input type="range" min={0} max={1} step={0.01} value={volume}
@@ -75,7 +75,7 @@ export default function SettingsModal() {
 
           {/* ---------- ambience ---------- */}
           <div className="setting-group">
-            <h3>Ambience & Appearance</h3>
+            <h3><i className="fa-solid fa-wand-magic-sparkles" /> Ambience & Appearance</h3>
             <div className="setting-row">
               <span className="row-label">Background mood</span>
               <div className="vibe-pills">
@@ -94,7 +94,7 @@ export default function SettingsModal() {
 
           {/* ---------- live status ---------- */}
           <div className="setting-group">
-            <h3>Live Status</h3>
+            <h3><i className="fa-solid fa-tower-broadcast" /> Live Status</h3>
             <div className="setting-row">
               <span className="row-label">Synced listeners</span>
               <span className="pill"><i className="fa-solid fa-users" /> {listeners}</span>
@@ -184,16 +184,10 @@ export default function SettingsModal() {
           </div>
 
           {/* ---------- about ---------- */}
-          <div className="setting-group">
-            <h3>About</h3>
-            <p style={{ fontSize: 12, color: 'var(--muted-2)', lineHeight: 1.7 }}>
-              Audio streams & lyric files load from your shared Google Drive folder.
-              Swap songs by editing <code>public/data/playlist.json</code> or run
-              <code> npm run refresh:playlist</code> to re-scan the folder.
-            </p>
-            <p style={{ fontSize: 10.5, color: 'var(--muted-2)', marginTop: 10 }}>
-              build b3
-            </p>
+          <div className="setting-group about">
+            <h3><i className="fa-solid fa-heart" style={{ color: 'var(--red-soft)' }} /> ISHQ RADIO</h3>
+            <p className="about-heartline">Made with ♥ for lovers</p>
+            <p className="about-line">Live together · Feel the love</p>
           </div>
         </div>
       </div>

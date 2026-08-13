@@ -361,6 +361,74 @@ body.midnight .rail .vibe-widget { background: rgba(255, 255, 255, 0.02); }
   .rail .rail-tabs-card { height: min(58vh, 560px); }
 }
 
+/* ---------- seasoning: settings cards & custom moods ---------- */
+.modal-body .setting-group {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 15px 17px 16px;
+  margin-bottom: 12px;
+}
+.modal-body .setting-group h3 {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10.5px; letter-spacing: 2.4px; text-transform: uppercase;
+  color: var(--red-soft);
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.modal-body .setting-group.about { border-color: rgba(255, 42, 75, 0.22); text-align: center; }
+.about-heartline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 19px;
+  color: #ffe2e7;
+  margin: 4px 0 8px;
+}
+.about-line {
+  font-size: 10.5px;
+  letter-spacing: 3.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mood-diy {
+  display: flex; gap: 6px; width: 100%;
+}
+.mood-diy-input {
+  flex: 1; min-width: 0;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 42, 75, 0.35);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-family: var(--font-ui);
+  font-size: 12px; color: #fff;
+  outline: none;
+}
+.mood-diy-input::placeholder { color: rgba(255, 255, 255, 0.35); }
+.mood-diy-input:focus { border-color: rgba(255, 42, 75, 0.7); }
+.mood-diy-go {
+  width: 36px; flex: 0 0 auto;
+  border-radius: 10px;
+  background: rgba(255, 42, 75, 0.2);
+  border: 1px solid rgba(255, 42, 75, 0.45);
+  color: #fff; cursor: pointer;
+}
+.mood-diy-go:hover { background: rgba(255, 42, 75, 0.35); }
+.sidebar .mood-chip.custom .mood-x {
+  margin-left: auto;
+  display: grid; place-items: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  opacity: 0.45;
+  color: #fff;
+  font-size: 10px;
+}
+.sidebar .mood-chip.custom .mood-x:hover {
+  opacity: 1;
+  color: var(--red-soft);
+  background: rgba(255, 42, 75, 0.15);
+}
+
 /* ---------- seasoning ---------- */
 .song-dedication { background: rgba(255, 59, 87, 0.07); }
 .online-count.hearts-now i { color: var(--red-soft); }

@@ -57,6 +57,7 @@ export const useStore = create((set, get) => ({
   /* ------------------------------ prefs & ui */
   isShuffle: storage.get('ishq.shuffle', false),
   isRepeat: storage.get('ishq.repeat', false),
+  customMoods: storage.get('ishq.customMoods', []),
   isAdmin: storage.get('ishq.admin', false),
   theaterOpen: false,
   party: false,
@@ -257,7 +258,7 @@ export const useStore = create((set, get) => ({
    * Current player keeps working — the queue is replaced underneath it.
    */
   async playMood(id) {
-    const mood = moodById(id);
+    const mood = moodById(id) || get().customMoods.find((m) => m.id === id);
     if (!mood || get().moodBusy) return;
     const s = get();
     if (s.inLive) s.markManual(`you drifted into the ${mood.label} mood`);
@@ -298,6 +299,30 @@ export const useStore = create((set, get) => ({
     } finally {
       set({ moodBusy: false });
     }
+  },
+
+  /** Create a DIY mood from a free-text vibe and start it right away. */
+  addCustomMood(label) {
+    const s = get();
+    const text = String(label || '').trim().slice(0, 24);
+    if (!text || s.moodBusy) return;
+    if (s.customMoods.some((m) => m.label.toLowerCase() === text.toLowerCase())) {
+      pushToast(`"${text}" mood already exists`, 'info');
+      return;
+    }
+    const id = 'custom-' + text.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 24) + '-' + Date.now().toString(36);
+    const customMoods = [...s.customMoods, { id, label: text, query: `${text} romantic songs` }];
+    storage.set('ishq.customMoods', customMoods);
+    set({ customMoods });
+    get().playMood(id);
+  },
+
+  removeCustomMood(id) {
+    const s = get();
+    const customMoods = s.customMoods.filter((m) => m.id !== id);
+    storage.set('ishq.customMoods', customMoods);
+    set({ customMoods });
+    if (s.mood === id) set({ mood: null });
   },
 
   toggleParty() { set({ party: !get().party }); },

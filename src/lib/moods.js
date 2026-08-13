@@ -14,6 +14,9 @@ export const MOODS = [
   { id: 'romance',   label: 'Romance',   icon: 'fa-hand-holding-heart', query: 'romantic hindi songs' },
   { id: 'english-pop', label: 'English Pop', icon: 'fa-globe',        query: 'best english pop songs' },
   { id: 'genz',      label: 'Gen-Z',     icon: 'fa-bolt',             query: 'gen z trending viral songs' },
+  { id: 'old-classics', label: 'Old Classics', icon: 'fa-record-vinyl', query: 'old hindi romantic classic songs' },
+  { id: 'sufi',      label: 'Sufi',      icon: 'fa-hands-praying',    query: 'sufi romantic songs hindi' },
+  { id: 'celebrate', label: 'Celebrate', icon: 'fa-champagne-glasses', query: 'bollywood party dance love songs' },
   { id: 'jordan-core', label: 'Jordan Core', icon: 'fa-fire',         drive: true }
 ];
 
