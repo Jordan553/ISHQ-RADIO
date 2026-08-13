@@ -1,0 +1,13 @@
+{
+  "currentTrackId": "tum-hi-ho",
+  "currentSongIndex": 0,
+  "isPlaying": true,
+  "startedAt": 0,
+  "currentTimeOffset": 0,
+  "volume": 0.85,
+  "isShuffle": false,
+  "isRepeat": false,
+  "updatedBy": "host",
+  "updatedAt": 0,
+  "liveListenerCount": 1
+}

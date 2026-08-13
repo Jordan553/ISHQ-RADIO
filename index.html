@@ -1,77 +1,19 @@
-<!DOCTYPE html>
-<html lang="hi">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>इश्क़ — ISHQ Radio</title>
-<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230a0a0b'/><text x='32' y='44' font-size='26' text-anchor='middle' fill='%23f2efe9' font-family='serif'>इश्क़</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#070608" />
+  <meta name="description" content="ISHQ RADIO — a live romantic music lounge. Listen together, feel the love." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%23ff5a6e'/%3E%3Cstop offset='100%25' stop-color='%23b0122f'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M16 28 C 8 20 4 15 4 10 a 6 6 0 0 1 12 -2 a 6 6 0 0 1 12 2 c 0 5 -4 10 -12 18 z' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,500;1,600&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <title>ISHQ RADIO — Live Together. Feel the Love.</title>
 </head>
-<body class="s-loading">
-  <div class="bg">
-    <span class="glyph g1">इश्क़</span><span class="glyph g2">इश्क़</span>
-    <span class="glyph g3">इश्क़</span><span class="glyph g4">इश्क़</span>
-    <span class="glyph g5">इश्क़</span><span class="glyph g6">इश्क़</span>
-    <span class="heart">इश्क़</span>
-  </div>
-  <div class="ambient" aria-hidden="true"><img id="ambientArt" alt="" draggable="false"></div>
-  <div class="grain"></div>
-  <div class="vignette"></div>
-
-  <div class="shell">
-    <header>
-      <div class="onair"><span class="dot"></span><span>On Air</span></div>
-      <div class="wordmark">इश्क़<small>ISHQ</small></div>
-      <div class="counts" id="counts">—</div>
-    </header>
-
-    <main>
-      <div class="state load">
-        <div class="spin"></div>
-        <div class="head">इश्क़</div>
-        <div class="msg">Tuning in…</div>
-      </div>
-      <div class="state error">
-        <div class="head">इश्क़</div>
-        <div class="msg" id="errmsg">Could not reach the station.</div>
-        <button id="retry">Retry</button>
-      </div>
-      <div class="state empty">
-        <div class="head">इश्क़</div>
-        <div class="msg">Nothing on the dial yet. Add songs to your playlist and they will join the air.</div>
-      </div>
-
-      <div class="stage">
-        <div class="artwrap"><img class="art" id="art" alt="" draggable="false"></div>
-        <h1 class="now" id="title">इश्क़</h1>
-        <div class="meta" id="meta">—</div>
-        <div class="controls">
-          <button class="side" id="prev" aria-label="Previous track">
-            <svg viewBox="0 0 24 24"><path d="M18 18l-8.5-6L18 6v12zM8 6H6v12h2z"/></svg>
-          </button>
-          <button class="play" id="play" aria-label="Play / Pause">
-            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
-          </button>
-          <button class="side" id="next" aria-label="Next track">
-            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6h2v12h-2z"/></svg>
-          </button>
-          <button class="side" id="fsbtn" aria-label="Full screen">
-            <svg class="icon-expand" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            <svg class="icon-compress" viewBox="0 0 24 24"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
-          </button>
-        </div>
-      </div>
-    </main>
-
-    <footer>Auto-syncs new videos &middot; ISHQ इश्क़ &middot; <span class="sync" id="sync">SOLO</span><br><span class="credit">Made with ❤️ by JORDAN</span></footer>
-  </div>
-
-  <div id="player"></div>
-
-<script src="script.js"></script>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

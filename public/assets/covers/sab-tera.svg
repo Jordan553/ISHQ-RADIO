@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="92%">
+      <stop offset="0%" stop-color="#3a0f1e"/>
+      <stop offset="52%" stop-color="#17060d"/>
+      <stop offset="100%" stop-color="#070204"/>
+    </radialGradient>
+    <linearGradient id="fx" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff6d85"/>
+      <stop offset="55%" stop-color="#ff2a4b"/>
+      <stop offset="100%" stop-color="#991130"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff2a4b" stop-opacity=".5"/>
+      <stop offset="100%" stop-color="#ff2a4b" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <circle cx="300" cy="252" r="185" fill="url(#glow)" filter="url(#soft)"/>
+  <circle cx="300" cy="252" r="150" fill="none" stroke="url(#fx)" stroke-width="2" opacity=".35"/>
+  <circle cx="300" cy="252" r="140" fill="none" stroke="#ffffff" stroke-width="1" opacity=".12" stroke-dasharray="2 8"/>
+  <text x="300" y="284" font-family="Georgia, serif" font-style="italic" font-size="128" fill="url(#fx)" text-anchor="middle">S</text>
+  <text x="300" y="328" font-family="Georgia, serif" font-size="26" letter-spacing="9" fill="#f5eff1" text-anchor="middle" opacity=".88">SHUDDH DESI </text>
+  <text x="300" y="352" font-family="Georgia, serif" font-size="13" letter-spacing="4" fill="#9a8f94" text-anchor="middle">ISHQ RADIO</text>
+  <path d="M300 514 c-57 -47 -104 -84 -104 -135 a56 56 0 0 1 104 -36 a56 56 0 0 1 104 36 c0 51 -47 88 -104 135 z" fill="url(#fx)"/>
+  <circle cx="300" cy="50" r="3" fill="#ff6d85" opacity=".9"/>
+  <circle cx="94" cy="138" r="2" fill="#ff6d85" opacity=".5"/>
+  <circle cx="508" cy="108" r="2.5" fill="#ff6d85" opacity=".4"/>
+</svg>

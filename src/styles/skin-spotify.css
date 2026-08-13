@@ -1,0 +1,447 @@
+/* ============================================================
+   ISHQ RADIO — Spotify-clean skin (flat zinc + one red accent)
+   Loaded last; overrides the romantic-glass skin.
+   ============================================================ */
+
+:root {
+  --bg: #0a0a0c;
+  --panel: #15151a;
+  --panel-solid: #111114;
+  --stroke: rgba(255, 255, 255, 0.07);
+  --stroke-strong: rgba(255, 90, 110, 0.35);
+  --red: #ff3b57;
+  --red-soft: #ff5470;
+  --red-deep: #c81e3f;
+  --red-dim: rgba(255, 59, 87, 0.12);
+  --text: #f5f5f7;
+  --text-2: #c8c8d0;
+  --muted: #9898a2;
+  --muted-2: #6a6a74;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --blur: 0px;
+  --sidebar-w: 240px;
+  --rail-w: 340px;
+  --topbar-h: 60px;
+}
+
+/* ---------- calm background ---------- */
+.bg-blobs .blob { opacity: 0.55; filter: blur(100px) saturate(1.1); }
+.bg-blobs .blob-1 { background: radial-gradient(circle, rgba(178, 18, 47, 0.65), transparent 65%); }
+.bg-blobs .blob-2 { background: radial-gradient(circle, rgba(255, 42, 75, 0.5), transparent 65%); }
+.bg-blobs .blob-3 { background: radial-gradient(circle, rgba(120, 20, 50, 0.55), transparent 65%); }
+.grain { opacity: 0.012; animation: none; }
+.vignette {
+  background: radial-gradient(ellipse at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.14) 100%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.14), transparent 22%);
+}
+
+/* ---------- flat shell ---------- */
+.topbar {
+  background: rgba(12, 12, 16, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--stroke);
+}
+.topbar .icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+}
+.topbar .icon-btn:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--stroke); color: var(--text); box-shadow: none; }
+.topbar .icon-btn:active { transform: scale(0.92); }
+.topbar .icon-btn.on { color: var(--red-soft); background: var(--red-dim); }
+
+/* theater button in the topbar — always findable */
+.topbar .theater-top-btn {
+  color: var(--red-soft);
+  border: 1px solid rgba(255, 90, 110, 0.4);
+  background: rgba(255, 59, 87, 0.1);
+}
+.topbar .theater-top-btn:hover {
+  background: rgba(255, 59, 87, 0.2);
+  border-color: rgba(255, 90, 110, 0.7);
+  box-shadow: 0 0 16px rgba(255, 42, 75, 0.35);
+}
+
+/* keep the topbar from ever overflowing — search shrinks, right side is fixed */
+.search-box { flex: 0 1 auto; min-width: 0; }
+.brand, .live-chip, .top-right, .join-room, .topbar .icon-btn { flex-shrink: 0; }
+
+/* listeners count — decorative, hides first when the bar gets tight */
+@media (max-width: 1280px) {
+  .topbar .listen-together { display: none; }
+}
+@media (max-width: 1024px) {
+  .search-box { width: min(300px, 30vw); }
+}
+
+/* listeners — plain text count, no pill box, quieter than actions */
+.listen-together {
+  background: none;
+  border: 0;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0 2px;
+  gap: 8px;
+}
+.listen-together .avatar { width: 22px; height: 22px; border-color: var(--bg); }
+.listen-ct { font-size: 12px; color: var(--muted-2); }
+.listen-ct strong { color: var(--text-2); }
+
+.sidebar {
+  background: rgba(14, 14, 18, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-right: 1px solid var(--stroke);
+}
+.nav-item { border-radius: 10px; }
+.nav-item:hover { background: rgba(255, 255, 255, 0.05); }
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(255, 38, 66, 0.14), rgba(255, 38, 66, 0.03));
+  border-color: transparent;
+  box-shadow: none;
+  color: #fff;
+}
+.nav-item.active::before { display: none; }
+
+/* ---------- player hero: floating glass card (Apple-inspired) ---------- */
+.now-playing {
+  background: linear-gradient(180deg, rgba(20, 20, 27, 0.55), rgba(16, 16, 22, 0.35));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 28px;
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  gap: 16px;
+  padding: 30px 28px 24px;
+}
+.now-playing::before, .now-playing::after { background: transparent; }
+.main, .page, .stage { background: transparent; }
+.art-wrap { width: min(280px, 60vw); margin: 4px 0; }
+.art-glow { display: none; }
+.vinyl-disc { display: none; }
+.artwork {
+  inset: 0;
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.artwork:hover { border: none; }
+.eyebrow { color: var(--red-soft); letter-spacing: 2.6px; font-size: 11px; }
+.track-title {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: clamp(22px, 2.7vw, 32px);
+  letter-spacing: -0.4px;
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+  margin: 8px 0 6px;
+  max-width: 560px;
+  min-height: 2.5em;
+}
+.track-artist {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-2);
+  max-width: 460px;
+  height: 24px;
+}
+.track-artist .artist-sub { color: var(--muted); }
+
+/* ---------- flat transport ---------- */
+.ctrl-btn {
+  width: 44px; height: 44px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+.ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: none;
+  transform: translateY(-1px);
+}
+.ctrl-btn:active { transform: scale(0.92); }
+.ctrl-btn.on { background: var(--red-dim); color: var(--red-soft); border-color: rgba(255, 90, 110, 0.25); box-shadow: none; }
+.ctrl-side .ctrl-btn {
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.75;
+}
+.ctrl-side .ctrl-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.06); }
+.play-btn {
+  width: 74px; height: 74px;
+  background: linear-gradient(140deg, #ff4d68, #e0203f);
+  border: none;
+  box-shadow: 0 10px 30px rgba(255, 42, 75, 0.4);
+  transition: transform 0.2s var(--ease), filter 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.play-btn:hover { transform: scale(1.06); filter: brightness(1.08); box-shadow: 0 14px 36px rgba(255, 42, 75, 0.55); }
+.play-btn:active { transform: scale(0.96); }
+.play-btn.playing { background: linear-gradient(140deg, #ff4d68, #e0203f); }
+.play-btn:disabled { filter: grayscale(0.4); opacity: 0.65; box-shadow: none; }
+
+.btn-live {
+  background: linear-gradient(140deg, #ff4d68, #e0203f);
+  box-shadow: none;
+  animation: none;
+}
+.btn-live:hover { box-shadow: 0 6px 18px rgba(255, 42, 75, 0.4); }
+
+/* ---------- mood chips: flat pills ---------- */
+.mood-chip {
+  background: #1c1c21;
+  border: 1px solid transparent;
+  border-radius: 999px;
+}
+.mood-chip:hover { background: #27272d; border-color: var(--stroke); color: #fff; transform: none; }
+.mood-chip.active {
+  background: var(--red);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 42, 75, 0.35);
+}
+.mood-chip.jordan.active {
+  background: linear-gradient(135deg, #ff7a3c, var(--red));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255, 110, 60, 0.35);
+}
+
+/* ---------- rail: one hero glass panel + flat quiet widgets ---------- */
+.rail {
+  width: 340px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - var(--topbar-h) - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.rail > * {
+  width: 100%;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+/* the lyric/queue panel is the rail's single glass surface */
+.rail-tabs-card {
+  background: rgba(18, 18, 24, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 20px;
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
+}
+/* secondary widgets — flat, quiet, clearly less important */
+.listen-card, .love-letter, .live-moments {
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  padding: 12px 14px;
+}
+.rail .vibe-widget {
+  background: rgba(255, 255, 255, 0.028);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+/* listeners — a slim status line, not a card */
+.listen-card { display: flex; align-items: center; padding: 10px 14px; }
+.listen-card .lc-row { padding: 0; flex: 1; }
+.listen-card .avatar { width: 26px; height: 26px; }
+.live-moments, .love-letter { flex: 0 0 auto; }
+.lm-reacts { gap: 7px; }
+.lm-reaction {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+.lm-reaction:hover { background: rgba(255, 255, 255, 0.09); transform: translateY(-2px); }
+.lm-input { background: rgba(10, 10, 14, 0.7); border: 1px solid var(--stroke); }
+.lm-hint { color: var(--muted-2); }
+.lm-send { background: linear-gradient(140deg, #ff4d68, #e0203f); border: none; }
+.lm-send:hover { box-shadow: 0 4px 14px rgba(255, 42, 75, 0.4); }
+.lm-bubble { filter: drop-shadow(0 0 8px rgba(255, 42, 75, 0.5)); }
+.lm-feed-item { background: rgba(255, 255, 255, 0.02); }
+
+.ll-write { background: rgba(255, 59, 87, 0.08); border: 1px dashed rgba(255, 59, 87, 0.4); }
+.ll-write:hover { background: rgba(255, 59, 87, 0.16); }
+.ll-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid transparent; }
+.ll-btn:hover { background: rgba(255, 255, 255, 0.09); }
+
+/* ---------- rail tabs + queue polish ---------- */
+.q-thumb { border-radius: 10px; background: #1a1a1f; }
+.rail-tab:hover { background: rgba(255, 255, 255, 0.05); }
+.rail-tab.active { background: var(--red-dim); color: #fff; }
+.rail-tab { border-radius: 10px; letter-spacing: 1px; }
+.q-item { border-radius: 12px; padding: 9px 10px; }
+.q-item:hover { background: rgba(255, 255, 255, 0.045); }
+.q-item:active { transform: scale(0.99); }
+.q-item.playing {
+  background: linear-gradient(90deg, rgba(255, 59, 87, 0.12), rgba(255, 59, 87, 0.02));
+  border-color: rgba(255, 90, 110, 0.22);
+}
+.q-item.playing::before {
+  content: "";
+  position: absolute; left: 0; top: 22%; bottom: 22%;
+  width: 3px; border-radius: 3px;
+  background: linear-gradient(180deg, var(--red-soft), var(--red-deep));
+}
+.q-idx { font-size: 11px; color: var(--muted-2); font-variant-numeric: tabular-nums; }
+.q-title { font-weight: 600; }
+.q-dur { font-size: 11.5px; }
+
+/* ---------- midnight: flat blue-black ---------- */
+body.midnight { background: #07070d; }
+body.midnight .topbar { background: rgba(13, 13, 19, 0.72); }
+body.midnight .sidebar { background: rgba(14, 14, 21, 0.55); }
+body.midnight .rail-tabs-card { background: rgba(16, 18, 27, 0.4); }
+body.midnight .now-playing { background: linear-gradient(180deg, rgba(16, 18, 27, 0.5), rgba(13, 15, 22, 0.3)); }
+body.midnight .blob { opacity: 0.16; filter: blur(100px) saturate(0.7); }
+body.midnight .track-title { text-shadow: none; }
+body.midnight .listen-card,
+body.midnight .love-letter,
+body.midnight .live-moments,
+body.midnight .rail .vibe-widget { background: rgba(255, 255, 255, 0.02); }
+
+/* ---------- theater: calm ---------- */
+.theater-bar-controls .btn-live { background: linear-gradient(140deg, #ff4d68, #e0203f); box-shadow: none; animation: none; }
+
+/* ---------- seasoning ---------- */
+.song-dedication { background: rgba(255, 59, 87, 0.07); }
+.online-count.hearts-now i { color: var(--red-soft); }
+
+@media (max-width: 720px) {
+  .art-wrap { width: min(230px, 62vw); }
+  .play-btn { width: 62px; height: 62px; }
+}
+/* ---------- art canvas: party mode + theater backdrop ---------- */
+.art-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  animation: art-in 0.9s var(--ease) both;
+}
+@keyframes art-in { from { opacity: 0; } }
+.theater-art {
+  z-index: 0;
+  position: absolute;
+}
+.theater-art + .theater-ambient { z-index: 1; }
+
+body.party .now-playing { border-color: rgba(255, 90, 110, 0.28); }
+body.party .artwork { box-shadow: 0 0 46px rgba(255, 42, 75, 0.35); }
+body.party .mood-aura { opacity: 1; }
+body.party .grain { opacity: 0.03; }
+
+/* refresh-drive chip in the queue head */
+.q-refresh {
+  margin-left: 8px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: #1c1c21;
+  color: var(--muted);
+  font-size: 10px;
+  display: inline-grid; place-items: center;
+  cursor: pointer;
+  border: 1px solid var(--stroke);
+  vertical-align: middle;
+  transition: all 0.2s var(--ease);
+}
+.q-refresh:hover { color: #fff; background: #2a2a31; transform: rotate(180deg); }
+
+/* rail cards: the queue owns the tall space, decorations follow below */
+.rail .rail-tabs-card { max-height: 62vh; min-height: 300px; }
+.rail .queue-list { padding: 10px; }
+.rail::-webkit-scrollbar { width: 6px; }
+.rail::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 999px; }
+.rail::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+   Song panel — the library/queue column, full height, left of
+   the stage. Widgets ride below it in slim cards; the queue owns
+   the vertical space. No floating blocks, no cramped cards.
+   ============================================================ */
+/* main stage: player left, fixed-width rail right */
+.main {
+  grid-template-columns: minmax(0, 1fr) var(--rail-w);
+  gap: 24px;
+  align-items: start;
+  padding: 24px 26px 92px;
+}
+.song-widgets { display: contents; }
+
+/* stage keeps the player centered and breathing */
+.stage { justify-content: center; }
+.stage > * { max-width: 680px; }
+
+/* ============================================================
+   Mobile — single column, player on top, rail becomes a
+   full-width glass sheet below, cards full width.
+   ============================================================ */
+@media (max-width: 980px) {
+  .main { grid-template-columns: 1fr; padding: 14px 12px 96px; gap: 20px; }
+  .stage { justify-content: flex-start; }
+  .rail {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    max-height: none;
+    overflow: visible;
+    gap: 16px;
+  }
+  .rail .rail-tabs-card { max-height: 58vh; }
+  .rail .live-moments { max-height: none; }
+}
+
+/* topbar compaction so the mobile shell never overflows horizontally */
+@media (max-width: 640px) {
+  .topbar .search-box { display: none; }
+  .topbar .live-chip { display: none; }
+  .topbar .moon-badge { display: none; }
+  .top-right { gap: 6px; }
+  .topbar .icon-btn:not(.menu-btn) { width: 32px; height: 32px; }
+}
+@media (max-width: 480px) {
+  .topbar .icon-btn:not(.menu-btn) { width: 28px; height: 28px; }
+  .top-right { gap: 4px; }
+  .top-right .icon-btn:has(.fa-wand-magic-sparkles) { display: none; }
+}
+
+/* ============================================================
+   Performance pass — cheap compositing only:
+   - no backdrop blur / heavy shadows on surfaces
+   - heavy decorative layers off on smaller screens
+   - queue rows render inside their own paint containment
+   ============================================================ */
+.topbar,
+.sidebar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.q-item { content-visibility: auto; contain-intrinsic-size: 64px; }
+.q-item .q-thumb img { content-visibility: auto; }
+@media (max-width: 1280px) {
+  .grain { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* defensive: below 1024 the shell must be a single fluid column —
+   no stray implicit grid tracks squeezing the main stage */
+@media (max-width: 1024px) {
+  #app, #app.ready {
+    grid-template-areas: "topbar topbar" "main main";
+    grid-template-columns: 1fr;
+    grid-template-rows: var(--topbar-h) 1fr;
+  }
+  .sidebar { grid-area: unset; }
+  .main { width: 100%; }
+}
