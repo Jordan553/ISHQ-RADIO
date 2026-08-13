@@ -21,6 +21,7 @@ import MoodAura from './components/MoodAura.jsx';
 import ArtCanvas from './components/ArtCanvas.jsx';
 import BeatLyrics from './components/BeatLyrics.jsx';
 import VibeLayer from './components/VibeLayer.jsx';
+import VibeFullscreen from './components/VibeFullscreen.jsx';
 import { useClock } from './hooks/useClock.js';
 import { useSwipe } from './hooks/useSwipe.js';
 
@@ -160,6 +161,7 @@ export default function App() {
       <SettingsModal />
       <ToastTray />
       {!joinNeeded && <FullscreenLyrics />}
+      {!joinNeeded && <VibeFullscreen />}
       <VibeLayer />
 
       <Loader />

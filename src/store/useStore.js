@@ -60,6 +60,7 @@ export const useStore = create((set, get) => ({
   customMoods: storage.get('ishq.customMoods', []),
   isAdmin: storage.get('ishq.admin', false),
   vibe: storage.get('ishq.vibe', false),
+  vibeFsOpen: false,
   theaterOpen: false,
   party: false,
   settingsOpen: false,
@@ -335,6 +336,16 @@ export const useStore = create((set, get) => ({
     set({ vibe: next });
     pushToast(next ? 'Vibe on — the song is the room now' : 'Vibe off — back to the lounge', next ? 'live' : 'info');
   },
+
+  /** Fullscreen vibe — the video of the online song fills the screen. */
+  openVibeFs() {
+    if (!get().onlineNow) {
+      pushToast('Vibe fullscreen needs an online song — the video plays in sync', 'warn');
+      return;
+    }
+    set({ vibeFsOpen: true });
+  },
+  closeVibeFs() { set({ vibeFsOpen: false }); },
 
   /**
    * Drive sync — the app's whole music library comes from your Drive

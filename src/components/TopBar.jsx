@@ -21,6 +21,7 @@ export default function TopBar() {
   const toggleParty = useStore((s) => s.toggleParty);
   const vibe = useStore((s) => s.vibe);
   const toggleVibe = useStore((s) => s.toggleVibe);
+  const openVibeFs = useStore((s) => s.openVibeFs);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -193,6 +194,17 @@ export default function TopBar() {
           <i className="fa-solid fa-circle-half-stroke" />
           <span>Vibe</span>
         </button>
+
+        {vibe && (
+          <button
+            className="icon-btn vibe-fs-btn"
+            aria-label="Vibe fullscreen"
+            title="Vibe fullscreen — the video fills the screen"
+            onClick={openVibeFs}
+          >
+            <i className="fa-solid fa-expand" />
+          </button>
+        )}
 
         <button
           className={`icon-btn${party ? ' on' : ''}`}
