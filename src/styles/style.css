@@ -592,6 +592,32 @@ img { display: block; max-width: 100%; }
 }
 .q-live-cta:hover { background: linear-gradient(135deg, rgba(255, 42, 75, 0.4), rgba(255, 42, 75, 0.14)); box-shadow: 0 0 24px rgba(255, 42, 75, 0.25); }
 .q-live-cta:active { transform: scale(0.98); }
+
+/* ---------- stage karaoke line ---------- */
+.stage-lyric-holder {
+  min-height: 30px;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 8px;
+}
+.stage-lyric {
+  display: flex; align-items: flex-end; justify-content: center;
+  max-width: 100%;
+}
+.sl-text {
+  display: inline-block;
+  max-width: 100%;
+  text-align: center;
+  font-family: var(--font-lrc, var(--font-ui));
+  font-size: clamp(14px, 1.5vw, 18px);
+  font-style: italic;
+  line-height: 1.45;
+  color: #f2c8d4;
+  letter-spacing: 0.2px;
+  transition: opacity 0.26s ease, transform 0.26s ease;
+}
+.sl-text.out { opacity: 0; transform: translateY(8px); }
+.sl-text.in { opacity: 1; transform: none; }
+.sl-text.instr { color: var(--muted); font-size: 0.82em; }
 .q-thumb { position: relative; }
 
 /* ---------- vibe widget ---------- */

@@ -1,5 +1,6 @@
 import { useStore } from '../store/useStore.js';
 import PlayerProgress from './PlayerProgress.jsx';
+import StageLyric from './StageLyric.jsx';
 import { proxiedStreamUrl, toStreamUrl } from '../lib/drive.js';
 import { artUrl } from '../lib/thumb.js';
 
@@ -51,6 +52,8 @@ export default function NowPlaying({ compact = false }) {
           </div>
         </div>
       </div>
+
+      <div className="stage-lyric-holder"><StageLyric /></div>
 
       <div className="track-info">
         <span className="eyebrow">{current.album || 'ISHQ RADIO'} · {current.genre || 'Live'}</span>

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore.js';
 import { activeLineIndex } from '../lib/lrcParser.js';
-import { fetchLrc } from '../lib/lyrics.js';
+import { useLrc } from '../hooks/useLrc.js';
 
 /**
  * Shared timed-lyrics list. Renders the LRC lines with the active line
@@ -29,7 +29,6 @@ const QUOTES = [
 ];
 export function LyricsView({ trackId, theme = 'panel', focused = false }) {
   const playlist = useStore((s) => s.playlist);
-  const tracksMeta = useStore((s) => s.tracksMeta);
   const onlineNow = useStore((s) => s.onlineNow);
   const currentTime = useStore((s) => s.currentTime);
   const autoScroll = useStore((s) => s.autoScroll);
@@ -39,7 +38,7 @@ export function LyricsView({ trackId, theme = 'panel', focused = false }) {
   const userScrolledAt = useRef(0);
 
   const track = playlist.find((t) => t.id === trackId) || (onlineNow?.id === trackId ? onlineNow : null);
-  const meta = tracksMeta[trackId];
+  const meta = useLrc(track);
   const lrc = meta?.lrc;
   const status = meta?.status || 'pending';
   const lines = lrc?.lines || [];
@@ -48,22 +47,6 @@ export function LyricsView({ trackId, theme = 'panel', focused = false }) {
 
   const quoteRef = useRef(0);
   if (!quoteRef.current) quoteRef.current = 1 + Math.floor(Math.random() * QUOTES.length);
-
-  // lazy LRCLIB lookup — once per track, deduped in-flight (lib-level)
-  useEffect(() => {
-    if (!track) return;
-    const rec = useStore.getState().tracksMeta[trackId];
-    if (rec?.lrc || rec?.status === 'loading' || rec?.status === 'missing' || rec?.status === 'error') return;
-    useStore.setState((s) => ({ tracksMeta: { ...s.tracksMeta, [trackId]: { ...s.tracksMeta[trackId], status: 'loading' } } }));
-    fetchLrc(track).then(({ lrc: hitLrc, status: hitStatus }) => {
-      useStore.setState((s) => ({
-        tracksMeta: {
-          ...s.tracksMeta,
-          [trackId]: { lrc: hitLrc || s.tracksMeta[trackId]?.lrc || null, status: hitStatus }
-        }
-      }));
-    });
-  }, [track, trackId]);
 
   // smooth auto-scroll to the active line
   useEffect(() => {

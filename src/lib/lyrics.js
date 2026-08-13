@@ -50,7 +50,14 @@ export async function fetchLrc(track) {
       u.searchParams.set('title', title);
       u.searchParams.set('artist', artist);
       u.searchParams.set('duration', Number(track.duration) || 0);
-      const res = await fetch(u);
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      let res;
+      try {
+        res = await fetch(u, { signal: ctrl.signal });
+      } finally {
+        clearTimeout(timer);
+      }
       const { hit } = await res.json();
       if (!hit) return { lrc: null, status: 'missing', source: 'lrclib' };
 
