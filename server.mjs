@@ -1,20 +1,20 @@
 /**
  * ISHQ Radio production server — serves dist/ plus the same-origin
- * Google Drive relay (same contract as the vite dev proxy).
+ * relay (Drive audio, Drive playlist, YouTube search/stream, LRCLIB
+ * lyrics, thumbnails) via server/relay.mjs.
  *
- *   npm run build && npm start        →  http://localhost:4173
+ *   npm run build && npm start     →  http://localhost:4173
  *
- * The relay is what makes Drive playback bulletproof: the browser never
+ * The relay is what makes playback bulletproof: the browser never
  * touches Google cross-origin, so Chromium's ORB and Drive's missing
  * preflight support are irrelevant. Byte ranges (seeking) pass through.
  */
 
 import http from 'node:http';
-import https from 'node:https';
 import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
-import { onlineRoutes } from './server/online.mjs';
+import { nodeRelay } from './server/node-relay.mjs';
 
 /* Tiny .env loader (no dependency): ISHQ_DRIVE_KEY, ISHQ_JORDAN_FOLDER, PORT, HOST… */
 try {
@@ -48,40 +48,6 @@ const MIME = {
   '.map': 'application/json'
 };
 
-const DRIVE_HOST = 'drive.usercontent.google.com';
-
-function proxyDrive(req, res) {
-  const suffix = req.url.slice('/drive'.length);
-  const outbound = https.request(
-    {
-      hostname: DRIVE_HOST,
-      path: `/download${suffix}`,
-      method: req.method,
-      headers: {
-        Range: req.headers.range || 'bytes=0-',
-        Accept: '*/*',
-        Connection: 'keep-alive',
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36',
-        'Accept-Encoding': 'identity'
-      }
-    },
-    (up) => {
-      const h = { 'Cache-Control': 'no-store' };
-      if (up.headers['content-type']) h['Content-Type'] = up.headers['content-type'];
-      if (up.headers['content-length']) h['Content-Length'] = up.headers['content-length'];
-      if (up.headers['content-range']) h['Content-Range'] = up.headers['content-range'];
-      if (up.headers['accept-ranges']) h['Accept-Ranges'] = up.headers['accept-ranges'];
-      res.writeHead(up.statusCode, h);
-      up.pipe(res);
-    }
-  );
-  outbound.on('error', () => {
-    res.writeHead(502, { 'Content-Type': 'text/plain' });
-    res.end('Drive relay error');
-  });
-  outbound.end();
-}
-
 async function serve(dir, pathname, res) {
   const file = join(dir, normalize(pathname));
   if (!file.startsWith(dir)) {
@@ -100,8 +66,7 @@ async function serve(dir, pathname, res) {
 const server = http.createServer(async (req, res) => {
   const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
 
-  if (onlineRoutes(req, res)) return;
-  if (pathname.startsWith('/drive')) return proxyDrive(req, res);
+  if (await nodeRelay(req, res)) return;
   if (pathname === '/' || pathname === '/index.html') {
     const body = await readFile(join(DIST, 'index.html'));
     res.writeHead(200, { 'Content-Type': 'text/html', 'Cache-Control': 'no-cache, must-revalidate' });
