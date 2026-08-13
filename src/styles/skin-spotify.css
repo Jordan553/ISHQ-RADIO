@@ -546,14 +546,30 @@ body.vibe-fs .yt-frame {
   transition: opacity 1.2s var(--ease), filter 1.2s var(--ease);
 }
 /* lyrics over the vibe video — bigger, glowy, readable */
-#vibe-fs .beat-lyrics { z-index: 2; }
+#vibe-fs .beat-lyrics {
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 50% 46%, transparent 34%, rgba(4, 2, 3, 0.5) 100%),
+    linear-gradient(180deg, rgba(4, 2, 3, 0.35), transparent 24%, transparent 58%, rgba(4, 2, 3, 0.55));
+}
 #vibe-fs .bl-line.now { font-size: clamp(40px, 6vw, 66px); }
 #vibe-fs .bl-line {
   text-shadow: 0 3px 24px rgba(0, 0, 0, 0.95), 0 0 46px rgba(255, 42, 75, 0.5);
 }
 #vibe-fs .bl-line.prev, #vibe-fs .bl-line.next {
   font-size: clamp(18px, 2.4vw, 27px);
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.5);
+}
+#vibe-fs .bl-word { opacity: 0.66; }
+#vibe-fs .bl-word.on {
+  opacity: 1;
+  text-shadow: 0 0 34px rgba(255, 42, 75, 0.95), 0 0 90px rgba(255, 42, 75, 0.45);
+}
+#vibe-fs .bl-quote {
+  font-size: clamp(24px, 3.4vw, 40px);
+  max-width: 36ch;
+  color: #ffeef0;
+  text-shadow: 0 3px 30px rgba(0, 0, 0, 0.95), 0 0 60px rgba(255, 90, 110, 0.55);
 }
 body.vibe-fs #app {
   opacity: 0;
