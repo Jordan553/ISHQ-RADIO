@@ -26,10 +26,15 @@ export default function VibeFullscreen() {
   const inLive = useStore((s) => s.inLive);
 
   useEffect(() => {
+    document.body.classList.toggle('vibe-fs', open);
+    return () => document.body.classList.remove('vibe-fs');
+  }, [open]);
+
+  useEffect(() => {
     if (!open) return;
-    const el = document.getElementById('vibe-fs');
-    const req = el?.requestFullscreen || el?.webkitRequestFullscreen;
-    req?.call(el).catch?.();
+    // real browser fullscreen — same proven pattern as theater
+    const req = document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen;
+    req?.call(document.documentElement).catch?.();
     const onFsChange = () => {
       if (!document.fullscreenElement) close();
     };
