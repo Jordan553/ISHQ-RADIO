@@ -541,8 +541,8 @@ body.vibe .preload-frame { opacity: 0.25; filter: saturate(0.6); }
 /* ---------- vibe fullscreen — the video fills the screen ---------- */
 body.vibe-fs .yt-frame {
   opacity: 1;
-  filter: blur(10px) saturate(1.18) brightness(0.96);
-  transform: scale(1.06);
+  filter: none;
+  transform: none;
   transition: opacity 1.2s var(--ease), filter 1.2s var(--ease);
 }
 /* lyrics over the vibe video — bigger, glowy, readable */
@@ -621,7 +621,7 @@ body.vibe-fs #app {
   margin-left: 4px;
 }
 @media (max-width: 720px) {
-  body.vibe-fs .yt-frame { filter: blur(8px) saturate(1.15) brightness(0.96); transform: scale(1.06); }
+  body.vibe-fs .yt-frame { filter: none; transform: none; }
   .vibe-fs-bar { padding: 12px 14px 14px; }
   .vibe-fs-time { display: none; }
 }
