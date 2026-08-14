@@ -797,4 +797,12 @@ body.party .grain { opacity: 0.03; }
   }
   .sidebar { grid-area: unset; }
   .main { width: 100%; }
+  /* phones: let the shell grow with content so the page scrolls
+     instead of clipping the queue + live reactions below the fold */
+  #app, #app.ready {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+  .main { height: auto; overflow: visible; }
 }
